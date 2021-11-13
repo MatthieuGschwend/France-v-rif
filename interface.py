@@ -11,10 +11,9 @@ import streamlit as st
 @st.cache
 def load_data():
     '''Lecture du fichier csv'''
-    data_path = 'Data/collected_data_4.csv'
+    data_path = 'collected_data_4.csv'
     data = pd.read_csv(data_path)
     return data
-
 
 def liste_item(data):
     '''renvoie la liste des items '''
@@ -89,6 +88,13 @@ def affichage_classe(data_item):
     except:
         pass
 
+def affichage_description(data_item):
+    try:
+        product_description = data_item['product description'].values[0]
+        return st.text_area('Description',product_description)
+    except:
+        pass
+        
 #%% Analyse ANOVA globale
 @st.cache
 def classe_anova_replica(data):
@@ -125,18 +131,31 @@ def classe_anova_replica(data):
         data_item = data[data['product name'] == nom_produit]
         return data_item['product class'].values[0]
     
+    def age_article(nom_produit, data):
+        data_item = data_item = data[data['product name'] == nom_produit]
+        return data_item['product website_age_in_months'].values[0]
+    
+    def prix_article(nom_produit, data):
+        data_item = data_item = data[data['product name'] == nom_produit]
+        return data_item['product price'].values[0]
+        
+    
     # Construction d'un data frame avec toutes les infos 
     # 1 - valeurs des colonnes : 
     prix_moyen = [ecart_moy_prix_replica(nom,data) for nom in liste_item]
     green_moyen = [moy_site_green_replica(nom,data) for nom in liste_item]
     shopify_moyen = [moy_shopyfi_replica(nom,data) for nom in liste_item]
     label_item = [classe_item(nom, data) for nom in liste_item]
+    age_article = [age_article(nom, data) for nom in liste_item]
+    article_prix = [prix_article(nom, data) for nom in liste_item]
    
     df = pd.DataFrame({'Nom_item':liste_item,
                            'Ecart prix relatif': prix_moyen,
                            'Proportion Green Web Site': green_moyen, 
                            'Porportion Shopify': shopify_moyen,
-                           'Classe du produit' : label_item
+                           'Classe du produit' : label_item,
+                           'Age du produit' : age_article,
+                           'Prix du produit': article_prix
                            })
     
     # fig = px.box(df, x="Classe du produit", y="Porportion Shopify",color = "Classe du produit")
@@ -144,11 +163,32 @@ def classe_anova_replica(data):
     # st.plotly_chart(fig, use_container_width=True)
     
     return df
-        
+
+def vue_ensemble_data(data_classe, prix_min, prix_max):
+    data_ = data_classe[data_classe['Prix du produit'] > prix_min]
+    data_ = data_[data_['Prix du produit'] < prix_max]
+    fig = px.scatter(data_, x='Prix du produit', y='Age du produit',
+                     color='Classe du produit',
+                     marginal_y="violin", marginal_x="box", 
+                     trendline="ols", template="simple_white")
+    return st.plotly_chart(fig, use_container_width=True)
     
 
-
-
+def calcul_correlation_anova(data_classe, var_qualitative):
+    ''' Raport de corrélation entre une variable qualitative x et quantitative y'''
+    moyenne = data_classe[var_qualitative].mean()
+    classes = []
+    for classe in data_classe['Classe du produit'].unique():
+        val_classe = data_classe[data_classe['Classe du produit'] == classe][var_qualitative]
+        classes.append({'ni': len(val_classe),
+                        'moyenne_classe': val_classe.mean()})
+    SCT = sum([(yj-moyenne)**2 for yj in data_classe[var_qualitative]])
+    SCE = sum([c['ni']*(c['moyenne_classe']-moyenne)**2 for c in classes])
+    return st.write('le rapport de correlation entre ' + str(var_qualitative)
+                    +' et les classes des produits est de : ' + 
+                    str(round(SCE/SCT,4)))
+        
+       
 #%% TEST
 def interface():  
     
@@ -182,6 +222,9 @@ def interface():
         #st.title('Visualisation des réplicas '+str(mode))
         #st.write(data_item)
         st.title(str(mode))
+        
+        
+            
         affichage_classe(data_item)
         #product_image = data_item['product image'][0]
         #product_web_site  = data_item['product domain'][0]
@@ -197,6 +240,8 @@ def interface():
             #pass
         
         affichage_image(data_item)
+        if st.button('Afficher la description'):
+            affichage_description(data_item)
         affichage_prix(data_item)
         affichage_site(data_item)
         affichage_green(data_item)
@@ -232,24 +277,27 @@ def interface():
             
             
                 
-    if st.sidebar.checkbox("Analyse réplica par Classe"):
+    if st.sidebar.checkbox("Analyse des corrélations par Classe"):
         data_classe = classe_anova_replica(data)
-        mode = st.sidebar.selectbox("Type d'analyse", ['Ecart prix relatif',
-                                                        'Proportion Green Web Site',
-                                                        'Porportion Shopify'])
         
-        fig = px.box(data_classe, x="Classe du produit", y= mode ,color = "Classe du produit")
+        masque_prix = st.slider(
+        'Plage des prix',
+        0, 1000, (0, 500))
+        
+        vue_ensemble_data(data_classe,masque_prix[0],masque_prix[1])
+        
+        mode = st.sidebar.selectbox("Type d'analyse", ['Proportion Green Web Site',
+                                                       'Porportion Shopify'])
+        #'Ecart prix relatif' possible dans la select box mais Nan 
+        
+        fig = px.box(data_classe, x="Classe du produit", y= mode ,color = "Classe du produit",
+                     color_discrete_sequence=['grey','green','orange'],
+                     points = 'all')
         fig.update_traces(quartilemethod="exclusive") # or "inclusive", or "linear" by default
         st.plotly_chart(fig, use_container_width=True)
-            
         
-        
-    
-        
-        
-        
-
-
+        calcul_correlation_anova(data_classe,mode)
+       
 
 #%%
 ### VII - PROGRAMME PRINCIPAL
