@@ -15,9 +15,29 @@ def load_data():
     data = pd.read_csv(data_path)
     return data
 
+  
+def mois_annees(nb_mois):
+    nb_annes = int(nb_mois/12.)
+    nb_mois_ = int(nb_mois) % 12
+    an = ' an'
+    if nb_annes > 1:
+        an = ' ans'
+    if nb_mois_ == 0:
+        return str(nb_annes) + an
+    else:
+        return str(nb_annes) + an + ' et ' + str(nb_mois_) + ' mois'
+    
+    
+    
+
+
 def liste_item(data):
     '''renvoie la liste des items '''
     return data['product name'].unique()
+
+def liste_replica(data_item):
+    ''' renvoie la liste des réplicas pour un item'''
+    return data_item['replica name'].unique()
 
 def camembert(data, valeurs, noms ):
     '''renvoie un camembert : propotion des valeurs selon les noms '''
@@ -60,10 +80,9 @@ def affichage_site(data_item):
         
 def affichage_anciennete(data_item):
     try:
-        product_age_months = str(data_item['product website_age_in_months']\
-                                 .values[0])
-        age = '- Ancienneté du site : '+  product_age_months + ' mois'
-        return st.markdown(age)
+        product_age_months = data_item['product website_age_in_months']\
+                                 .values[0]
+        return st.markdown('- Ancienneté : ' + mois_annees(product_age_months))
     except:
         pass
 
@@ -91,9 +110,68 @@ def affichage_classe(data_item):
 def affichage_description(data_item):
     try:
         product_description = data_item['product description'].values[0]
-        return st.text_area('Description',product_description)
+        return st.text_area('Description',value = product_description, height = 180)
     except:
         pass
+    
+
+def affichage_replica_image(data_item,replica_name):
+    try:
+        replica_image = data_item[data_item['replica name']==replica_name]\
+            ['replica image'].values[0]
+        return st.image(replica_image, width = 200)
+    except:
+        pass
+    
+def affichage_replica_prix(data_item, replica_name):
+    try:
+        replica_prix = data_item[data_item['replica name']==replica_name]\
+            ['replica price'].values[0]
+        replica_prix = str(replica_prix)
+        return st.markdown('- Prix : ' + replica_prix +' euros')
+    except:
+        pass
+
+def affichage_replica_site(data_item, replica_name):
+    try:
+        replica_site = data_item[data_item['replica name']==replica_name]\
+            ['replica domain'].values[0]
+        return st.markdown('- Site web : ' + replica_site)
+    except:
+        pass
+        
+def affichage_replica_anciennete(data_item, replica_name):
+    try:
+        replica_age = data_item[data_item['replica name']==replica_name]\
+            ['replica website_age_in_months'].values[0]
+        return st.markdown('- Ancienneté : ' + mois_annees(replica_age))
+    except:
+        pass
+
+def affichage_replica_shopify(data_item, replica_name):
+    try:
+         replica_shopify = data_item[data_item['replica name']==replica_name]\
+            ['replica is_shopify'].values[0]
+         return st.markdown('- Shopify : ' + boolean_string(replica_shopify))
+    except:
+        pass
+    
+def affichage_replica_green(data_item, replica_name):
+    try:
+        replica_green = data_item[data_item['replica name']==replica_name]\
+            ['replica is_green_website'].values[0]
+        return st.markdown('- Fiable : ' + boolean_string(replica_green))
+    except:
+        pass
+
+def affichage_replica_description(data_item, replica_name):
+    try:
+        replica_description = data_item[data_item['replica name']==replica_name]\
+            ['replica description'].values[0]
+        return st.text_area('Description',value = replica_description, height = 180)
+    except:
+        pass
+
         
 #%% Analyse ANOVA globale
 @st.cache
@@ -170,7 +248,8 @@ def vue_ensemble_data(data_classe, prix_min, prix_max):
     fig = px.scatter(data_, x='Prix du produit', y='Age du produit',
                      color='Classe du produit',
                      marginal_y="violin", marginal_x="box", 
-                     trendline="ols", template="simple_white")
+                     trendline="ols", template="simple_white",
+                     title = "Corrélation entre le prix et l'age des produits en fonction de la Classe")
     return st.plotly_chart(fig, use_container_width=True)
     
 
@@ -188,12 +267,20 @@ def calcul_correlation_anova(data_classe, var_qualitative):
                     +' et les classes des produits est de : ' + 
                     str(round(SCE/SCT,4)))
         
-       
+        
+        
+    
+    
+
+
+
 #%% TEST
 def interface():  
     
     #st.title('Visualisation du data frame')
     data = load_data()
+    
+    # Définition de la langue :
     #st.write(data)
     
     #st.sidebar.checkbox("Présentation")
@@ -211,21 +298,95 @@ def interface():
     #recherche = st.text_input("un test text_input")
     
     
-    if st.sidebar.checkbox("Analyse par item"):
-        liste_items = liste_item(data)
-        mode = st.sidebar.selectbox('Liste des items', liste_items)
+    if st.sidebar.checkbox("Analyse par produit"):
+        
         #mode = st.sidebar.selectbox('Liste des items',np.insert(liste_items,0," "))
-
-        
-        data_item = data[data['product name'] == mode]
-        
         #st.title('Visualisation des réplicas '+str(mode))
         #st.write(data_item)
-        st.title(str(mode))
-        
-        
+        #st.subheader(str(mode))
+        col1, col2 = st.columns(2)
+        with col1:
+            st.header('Produit initial')
+            liste_items = liste_item(data)
+            mode = st.selectbox('Liste des produits', liste_items)
+            data_item = data[data['product name'] == mode]
+            affichage_image(data_item)
             
-        affichage_classe(data_item)
+        with col2:
+            st.header('Réplicas')
+            liste_replicas = liste_replica(data_item)
+            replica_name = st.selectbox('Liste des réplicas', liste_replicas)
+            affichage_replica_image(data_item,replica_name)
+            
+        
+        col3, col4 = st.columns(2)
+        with col3:
+            affichage_description(data_item)
+            affichage_prix(data_item)
+            affichage_site(data_item)
+            affichage_green(data_item)
+            affichage_anciennete(data_item)
+            affichage_shopify(data_item)
+            affichage_classe(data_item)
+            
+        
+        with col4:
+            affichage_replica_description(data_item,replica_name)
+            affichage_replica_prix(data_item,replica_name)
+            affichage_replica_site(data_item,replica_name)
+            affichage_replica_green(data_item,replica_name)
+            affichage_replica_anciennete(data_item,replica_name)
+            affichage_replica_shopify(data_item,replica_name)
+            
+           
+        
+        st.header("Informations sur l'ensemble des réplicas")
+        col5, col6 = st.columns([1, 2])
+        with col5:
+            st.markdown('- Nombe de réplicas : ' +  str(round(data_item.shape[0],2)))
+            st.markdown('- Prix moyen : ' +  str(round(data_item['replica price'].mean(),2)) )
+            st.markdown('- Green site web (%) : '  + 
+                    str(round(data_item['replica is_green_website'].mean() * 100,2)))
+            st.markdown('- Affluence moyenne : ' +  str(round(data_item['rank'].mean(),2)))
+            
+        with col6:
+            genre = st.radio("Visualisation complémentaire",('Domaines', 
+                                                             'Affluence/Prix/Ancienneté', 'Images'))
+        if genre == 'Domaines':
+            nb_domaine_replica = data_item["replica domain"].value_counts().reset_index()            
+            #camembert(nb_domaine_replica,'index','replica domain')
+            fig = px.pie(nb_domaine_replica, values = 'replica domain', names = 'index', title= 'Domaine des réplicas')
+            st.plotly_chart(fig, use_container_width=True)
+        if genre == 'Images':
+            liste_images_url = data_item['replica image'].tolist()
+            st.image(liste_images_url, width = 100)
+            
+        if genre == 'Affluence/Prix/Ancienneté':
+            data_affluence = data_item
+            data_affluence["replica is_green_website"] = [boolean_string(green) for
+                                                          green in data_item["replica is_green_website"]]
+            data_affluence['rank'] = [round(pop,2) for pop in data_item['rank']]
+            data_affluence['replica website_age_in_months'] = \
+                [round(age/12.,2) for age in data_item['replica website_age_in_months']]
+            fig = px.scatter(data_affluence,
+                             labels = {"replica price": 'Prix de la réplica',
+                                      "replica website_age_in_months" : 'Ancienneté de la réplica (années)',
+                                      "replica is_green_website" : "Le site de la réplica est Green",
+                                      "rank" : "Popularité du site"
+                                 },
+                             x="replica price",
+                             y="replica website_age_in_months",
+                             size="rank",
+                             color="replica is_green_website",
+                             title= 'Ancienneté, prix et afluence des réplicas',
+                             hover_name="replica domain", log_x=True, size_max=40)
+            st.plotly_chart(fig, use_container_width=True)
+            st.write("Les cercles représentent l'ensemble des réplicas du produit" + \
+                     " . La taille des cercles est définie selon l'afluence des sites" + \
+                         " marchants, la couleurs indique si le site est" + \
+                         " fiable (Green) ou non." )
+                         
+        
         #product_image = data_item['product image'][0]
         #product_web_site  = data_item['product domain'][0]
         #product_prix = str(data_item['product price'][0])
@@ -238,43 +399,6 @@ def interface():
             #st.markdown(product_lien_url)
         #except :
             #pass
-        
-        affichage_image(data_item)
-        if st.button('Afficher la description'):
-            affichage_description(data_item)
-        affichage_prix(data_item)
-        affichage_site(data_item)
-        affichage_green(data_item)
-        affichage_anciennete(data_item)
-        affichage_shopify(data_item)
-
-        
-        
-        st.markdown('## Information réplicas ')
-        st.markdown('- Nombe de réplicas : ' +  str(round(data_item.shape[0],2)))
-        st.markdown('- Prix moyen : ' +  str(round(data_item['replica price'].mean(),2)) )
-        st.markdown('- Green site web (%) : '  + 
-                    str(round(data_item['replica is_green_website'].mean() * 100,2)))
-        st.markdown('- Affluence moyenne : ' +  str(round(data_item['rank'].mean(),2)))
-        
-        
-        genre = st.radio("Informations complémentaires sur les réplicas",('Domaines', 'Affluence', 'Images'))
- 
-        if genre == 'Domaines':
-            nb_domaine_replica = data_item["replica domain"].value_counts().reset_index()            
-            #camembert(nb_domaine_replica,'index','replica domain')
-            fig = px.pie(nb_domaine_replica, values = 'replica domain', names = 'index', title= 'Domaine des réplicas')
-            st.plotly_chart(fig, use_container_width=True)
-        if genre == 'Images':
-            liste_images_url = data_item['replica image'].tolist()
-            st.image(liste_images_url, width = 100)
-            
-        if genre == 'Affluence':
-            fig = px.scatter(data_item, x="replica price", y="replica website_age_in_months",\
-                             size="rank", color="replica is_green_website",\
-                             hover_name="product domain", log_x=True, size_max=40)
-            st.plotly_chart(fig, use_container_width=True)
-            
             
                 
     if st.sidebar.checkbox("Analyse des corrélations par Classe"):
@@ -297,7 +421,15 @@ def interface():
         st.plotly_chart(fig, use_container_width=True)
         
         calcul_correlation_anova(data_classe,mode)
-       
+        
+        
+        
+    
+        
+        
+        
+
+
 
 #%%
 ### VII - PROGRAMME PRINCIPAL
