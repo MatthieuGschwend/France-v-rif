@@ -123,7 +123,7 @@ def app():
         for url in problematic_urls:
             st.write(url)
 
-    st.header('Study of processing time of functions :chart_with_upwards_trend:')
+    st.header('Study of processing time of functions :hourglass:')
     st.subheader('Global time taken')
     with st.expander("Time (in second) distribution of the main function"):
         main_function_data = log_data[log_data["function_name"].isin(
