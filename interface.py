@@ -19,19 +19,15 @@ def app():
 
 
     def mois_annees(nb_mois):
-        nb_annes = int(nb_mois/12.)
-        nb_mois_ = int(nb_mois) % 12
-        an = ' an'
-        if nb_annes > 1:
-            an = ' ans'
-        if nb_mois_ == 0:
-            return str(nb_annes) + an
-        else:
-            return str(nb_annes) + an + ' et ' + str(nb_mois_) + ' mois'
-
-
-
-
+    nb_annes = int(nb_mois/12.)
+    nb_mois_ = int(nb_mois) % 12
+    an = ' an'
+    if nb_annes > 1:
+        an = ' ans'
+    if nb_mois_ == 0:
+        return str(nb_annes) + an
+    else:
+        return str(nb_annes) + an + ' et ' + str(nb_mois_) + ' mois'
 
     def liste_item(data):
         '''renvoie la liste des items '''
@@ -76,7 +72,16 @@ def app():
     def affichage_site(data_item):
         try:
             product_web_site  = data_item['product domain'].values[0]
+            product_web_site = "["+product_web_site +"]" + '(https://' + product_web_site + ')'
             return st.markdown('- Site web : ' + product_web_site)
+        except:
+            pass
+
+    def affichage_url(data_item):
+        try:
+            product_url  = data_item['product url'].values[0]
+            product_url = "[Lien du produit]" + '(' + product_url + ')'
+            return st.markdown(product_url)
         except:
             pass
 
@@ -138,9 +143,20 @@ def app():
         try:
             replica_site = data_item[data_item['replica name']==replica_name]\
                 ['replica domain'].values[0]
+            replica_site = "["+replica_site +"]" + '(https://' + replica_site + ')'
             return st.markdown('- Site web : ' + replica_site)
         except:
             pass
+
+    def affichage_replica_url(data_item, replica_name):
+        try:
+            replica_url = data_item[data_item['replica name']==replica_name]\
+                ['replica url'].values[0]
+            replica_url = "[Lien de la réplica]" + '(' + replica_url + ')'
+            return st.markdown(replica_url)
+        except:
+            pass
+
 
     def affichage_replica_anciennete(data_item, replica_name):
         try:
@@ -173,6 +189,7 @@ def app():
             return st.text_area('Description',value = replica_description, height = 180)
         except:
             pass
+
 
 
     #%% Analyse ANOVA globale
@@ -231,8 +248,8 @@ def app():
 
         df = pd.DataFrame({'Nom_item':liste_item,
                                'Ecart prix relatif': prix_moyen,
-                               'Proportion Green Web Site': green_moyen, 
-                               'Porportion Shopify': shopify_moyen,
+                               'Proportion Green Web Site réplicas': green_moyen, 
+                               'Proportion Shopify réplicas': shopify_moyen,
                                'Classe du produit' : label_item,
                                'Age du produit' : age_article,
                                'Prix du produit': article_prix
@@ -249,9 +266,9 @@ def app():
         data_ = data_[data_['Prix du produit'] < prix_max]
         fig = px.scatter(data_, x='Prix du produit', y='Age du produit',
                          color='Classe du produit',
-                         marginal_y="violin", marginal_x="box", 
+                         marginal_y="box", marginal_x="box", 
                          trendline="ols", template="simple_white",
-                         title = "Corrélation entre le prix et l'age des produits en fonction de la Classe")
+                         color_discrete_sequence=['grey','green','orange'])
         return st.plotly_chart(fig, use_container_width=True)
 
 
@@ -265,7 +282,8 @@ def app():
                             'moyenne_classe': val_classe.mean()})
         SCT = sum([(yj-moyenne)**2 for yj in data_classe[var_qualitative]])
         SCE = sum([c['ni']*(c['moyenne_classe']-moyenne)**2 for c in classes])
-        return st.write('le rapport de correlation entre ' + str(var_qualitative)
+        correlation_lien = "[correlation]" + '(https://en.wikipedia.org/wiki/Correlation_ratio )'
+        return st.write('Le rapport de '+correlation_lien+' entre la ' + str(var_qualitative)
                         +' et les classes des produits est de : ' + 
                         str(round(SCE/SCT,4)))
 
@@ -303,7 +321,7 @@ def app():
         if st.sidebar.checkbox("Analyse par produit"):
 
             #mode = st.sidebar.selectbox('Liste des items',np.insert(liste_items,0," "))
-            #st.title('Visualisation des réplicas '+str(mode))
+            st.title("Analyse par produit")
             #st.write(data_item)
             #st.subheader(str(mode))
             col1, col2 = st.columns(2)
@@ -323,6 +341,7 @@ def app():
 
             col3, col4 = st.columns(2)
             with col3:
+                affichage_url(data_item)
                 affichage_description(data_item)
                 affichage_prix(data_item)
                 affichage_site(data_item)
@@ -333,6 +352,7 @@ def app():
 
 
             with col4:
+                affichage_replica_url(data_item,replica_name)
                 affichage_replica_description(data_item,replica_name)
                 affichage_replica_prix(data_item,replica_name)
                 affichage_replica_site(data_item,replica_name)
@@ -385,7 +405,7 @@ def app():
                 st.plotly_chart(fig, use_container_width=True)
                 st.write("Les cercles représentent l'ensemble des réplicas du produit" + \
                          " . La taille des cercles est définie selon l'afluence des sites" + \
-                             " marchants, la couleurs indique si le site est" + \
+                             " marchants, la couleur indique si le site est" + \
                              " fiable (Green) ou non." )
 
 
@@ -403,24 +423,43 @@ def app():
                 #pass
 
 
-        if st.sidebar.checkbox("Analyse des corrélations par Classe"):
+
+        if st.sidebar.checkbox("Analyse par Classe de produit"):
+            st.title('Analyse par Classe de produit')
+            st.subheader('Distribution des prix et anciennetés des produits selon la Classe')
             data_classe = classe_anova_replica(data)
 
-            masque_prix = st.slider(
-            'Plage des prix',
-            0, 1000, (0, 500))
+            col_bar1, col_bar2 = st.columns([1,2])       
+            with col_bar1:
+                masque_prix = st.slider(
+                'Plage des prix',
+                0, 1000, (0, 500))
 
             vue_ensemble_data(data_classe,masque_prix[0],masque_prix[1])
+            box_lien = "[box plot]" + '( https://en.wikipedia.org/wiki/Box_plot )'
+            regression_lien = "[régression]" + '(https://en.wikipedia.org/wiki/Linear_regression )'
 
-            mode = st.sidebar.selectbox("Type d'analyse", ['Proportion Green Web Site',
-                                                           'Porportion Shopify'])
+            st.markdown("Chaque point représente l'ancienneté et le prix d'un produit, les couleurs représentent les" +
+                     " differentes Classes. Une droite de "+regression_lien+" est tracée afin" +
+                     " d'exprimer les tendances générales")
+            st.markdown("- Droite : répartition de l'ancienneté des produits par un " + box_lien)
+            st.markdown("- Haut : répartition du prix du produit par un  "+ box_lien)
+
+            st.subheader('Caractéristiques des sites réplicas selon la Classe du produit')
+            mode = st.radio("Type d'analyse", ['Proportion Green Web Site réplicas',
+                                                           'Proportion Shopify réplicas'])
             #'Ecart prix relatif' possible dans la select box mais Nan 
 
-            fig = px.box(data_classe, x="Classe du produit", y= mode ,color = "Classe du produit",
+            fig = px.box(data_classe, y="Classe du produit", x= mode ,color = "Classe du produit",
                          color_discrete_sequence=['grey','green','orange'],
+                         orientation = 'h',
                          points = 'all')
             fig.update_traces(quartilemethod="exclusive") # or "inclusive", or "linear" by default
             st.plotly_chart(fig, use_container_width=True)
+
+            st.markdown('Pour un produit nous calculons la proportion de site Green (ou shopify) de' +
+                        ' ses réplicas. Un point représente cette proportion selon la classe du produit')
+            st.markdown('Un '+box_lien+ ' est ajouté pour visualiser les indicateurs statistiques')
 
             calcul_correlation_anova(data_classe,mode)
 
