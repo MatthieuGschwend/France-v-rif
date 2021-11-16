@@ -3,8 +3,10 @@ import pandas as pd
 import plotly.express as px
 import plotly.figure_factory as ff
 
+colors = ['#393E46', '#2BCDC1', '#F66095', '#F7CC57']
 
 def app():
+
     st.title('Log Analysis')
 
     st.header('Study of errors :microscope:')
@@ -131,54 +133,65 @@ def app():
 
         hist_data = main_function_data["process_time"].to_list()
         group_labels = "get_product_vs_replicas"
-        fig1 = ff.create_distplot([hist_data], [group_labels], bin_size=2)
+        fig1 = ff.create_distplot([hist_data], [group_labels], bin_size=2, colors=colors)
         st.plotly_chart(fig1, use_container_width=True)
 
     st.subheader('Diffbot vs Old scraper')
     with st.expander("Time (in second) distribution of the diffbot function and old scraper function"):
 
-        diffbot_data = log_data["process_time"][log_data["function_name"].isin(["data_Diffbot"])].to_list()
-        old_scraper_data = log_data["process_time"][log_data["function_name"].isin(["get_data"])].to_list()
+        diffbot_data = log_data["process_time"][log_data["function_name"].isin(
+            ["data_Diffbot"])].to_list()
+        old_scraper_data = log_data["process_time"][log_data["function_name"].isin(
+            ["get_data"])].to_list()
 
         hist_data_1 = [diffbot_data, old_scraper_data]
         group_labels_1 = ["data_Diffbot", "get_data"]
-        fig2 = ff.create_distplot(hist_data_1, group_labels_1)
+        fig2 = ff.create_distplot(hist_data_1, group_labels_1, colors=colors)
         st.plotly_chart(fig2, use_container_width=True)
 
     st.subheader('Old scraper detail processing time')
     with st.expander("Time (in second) distribution of each function that compose old scraper function"):
         
-        old_sc_func_1 = log_data["process_time"][log_data["function_name"].isin(["get_name"])].to_list()
-        old_sc_func_2 = log_data["process_time"][log_data["function_name"].isin(["get_description"])].to_list()
-        old_sc_func_3 = log_data["process_time"][log_data["function_name"].isin(["get_price"])].to_list()
-        old_sc_func_4 = log_data["process_time"][log_data["function_name"].isin(["get_image"])].to_list()
+        old_sc_func_1 = log_data["process_time"][log_data["function_name"].isin(
+            ["get_name"])].to_list()
+        old_sc_func_2 = log_data["process_time"][log_data["function_name"].isin(
+            ["get_description"])].to_list()
+        old_sc_func_3 = log_data["process_time"][log_data["function_name"].isin(
+            ["get_price"])].to_list()
+        old_sc_func_4 = log_data["process_time"][log_data["function_name"].isin(
+            ["get_image"])].to_list()
 
         hist_data_2 = [old_sc_func_1, old_sc_func_2, old_sc_func_3, old_sc_func_4]
         group_labels_2 = ["get_name", "get_description", "get_price", "get_image"]
-        fig3 = ff.create_distplot(hist_data_2, group_labels_2, bin_size=0.05)
+        fig3 = ff.create_distplot(hist_data_2, group_labels_2, bin_size=0.05, colors=colors)
         fig3.update_xaxes(range=[0, 4])
         st.plotly_chart(fig3, use_container_width=True)
 
     st.subheader('Aliexpress vs Google')
     with st.expander("Time (in second) distribution of the replicas collector functions"):
         
-        func_1 = log_data["process_time"][log_data["function_name"].isin(["data_Aliexpress"])].to_list()
-        func_2 = log_data["process_time"][log_data["function_name"].isin(["data_Google_combined"])].to_list()
+        func_1 = log_data["process_time"][log_data["function_name"].isin(
+            ["data_Aliexpress"])].to_list()
+        func_2 = log_data["process_time"][log_data["function_name"].isin(
+            ["data_Google_combined"])].to_list()
 
         hist_data_3 = [func_1, func_2]
         group_labels_3 = ["data_Aliexpress", "data_Google_combined"]
-        fig4 = ff.create_distplot(hist_data_3, group_labels_3, bin_size=0.1)
+        fig4 = ff.create_distplot(hist_data_3, group_labels_3, bin_size=0.1, colors=colors)
         st.plotly_chart(fig4, use_container_width=True)
 
     st.subheader('Google Vision')
     with st.expander("Time (in second) distribution of the google image classification function"):
         
-        goo_func_1 = log_data["process_time"][log_data["function_name"].isin(["dataset_Google_Vision"])].to_list()
-        goo_func_2 = log_data["process_time"][log_data["function_name"].isin(["data_Google_Vision"])].to_list()
+        goo_func_1 = log_data["process_time"][log_data["function_name"].isin(
+            ["dataset_Google_Vision"])].to_list()
+        goo_func_2 = log_data["process_time"][log_data["function_name"].isin(
+            ["data_Google_Vision"])].to_list()
 
         hist_data_4 = [goo_func_1, goo_func_2]
         group_labels_4 = ["dataset_Google_Vision", "data_Google_Vision"]
-        fig5 = ff.create_distplot(hist_data_4, group_labels_4, bin_size=0.1)
+
+        fig5 = ff.create_distplot(hist_data_4, group_labels_4, bin_size=0.1, colors=colors)
         fig5.update_xaxes(range=[0, 10])
         st.plotly_chart(fig5, use_container_width=True)
         st.markdown("""
@@ -189,4 +202,10 @@ def app():
         * **data_Google_Vision**: when the google image
         classification function is called only for one image. Called for the
         product page image classification.
+        """)
+
+    st.subheader('TO DO')
+    with st.expander("Expand"):
+        st.write("""Ajouter pie chart comparaison Succès vs Echec pour
+        remplace "On what proportion do the error occurs?"
         """)
