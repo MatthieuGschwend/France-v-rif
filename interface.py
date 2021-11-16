@@ -19,15 +19,15 @@ def app():
 
 
     def mois_annees(nb_mois):
-    nb_annes = int(nb_mois/12.)
-    nb_mois_ = int(nb_mois) % 12
-    an = ' an'
-    if nb_annes > 1:
-        an = ' ans'
-    if nb_mois_ == 0:
-        return str(nb_annes) + an
-    else:
-        return str(nb_annes) + an + ' et ' + str(nb_mois_) + ' mois'
+        nb_annes = int(nb_mois/12.)
+        nb_mois_ = int(nb_mois) % 12
+        an = ' an'
+        if nb_annes > 1:
+            an = ' ans'
+        if nb_mois_ == 0:
+            return str(nb_annes) + an
+        else:
+            return str(nb_annes) + an + ' et ' + str(nb_mois_) + ' mois'
 
     def liste_item(data):
         '''renvoie la liste des items '''
