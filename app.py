@@ -1,7 +1,7 @@
 import interface
 import log_analysis
 import streamlit as st
-import matplotlib
+
 
 
 PAGES = {
