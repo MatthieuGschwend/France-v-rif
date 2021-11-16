@@ -3,7 +3,7 @@ import log_analysis
 import streamlit as st
 
 
-
+st.set_page_config(layout="wide")
 PAGES = {
     "Analyse des données": interface,
     "Log analysis": log_analysis
