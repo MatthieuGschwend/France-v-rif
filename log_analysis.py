@@ -7,7 +7,7 @@ import plotly.figure_factory as ff
 def app():
     st.title('Log Analysis')
 
-    st.header('Study of errors')
+    st.header('Study of errors :microscope:')
 
     st.subheader('Raw Data')
     log_data = pd.read_csv("log.csv")
@@ -123,7 +123,7 @@ def app():
         for url in problematic_urls:
             st.write(url)
 
-    st.header('Study of processing time of functions')
+    st.header('Study of processing time of functions :chart_with_upwards_trend:')
     st.subheader('Global time taken')
     with st.expander("Time (in second) distribution of the main function"):
         main_function_data = log_data[log_data["function_name"].isin(
