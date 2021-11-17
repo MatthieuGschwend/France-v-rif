@@ -14,7 +14,7 @@ PAGES = {
     "EN":
     {
         "Log analysis": log_analysis_en,
-        "Analyse des données": interface_fr
+        "Analyse des données": interface_en
     }
 }
 
