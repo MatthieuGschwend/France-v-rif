@@ -49,12 +49,12 @@ def app():
 
     st.subheader('Données brutes')
 
-    col1, col2 = st.beta_columns(2)
+    col1, col2 = st.columns(2)
     with col1:
-        with st.beta_expander("log.csv"):
+        with st.expander("log.csv"):
             st.dataframe(log_data)
     with col2:
-        with st.beta_expander("colonnes"):
+        with st.expander("colonnes"):
             st.text("Explication des colonnes:")
             body = """
             * **url** : url de la page du produit.
@@ -89,13 +89,13 @@ def app():
     error_count_by_function = error_count_by_function.sort_values(
         by='error_message', ascending=False)
 
-    col1_, col2_ = st.beta_columns(2)
+    col1_, col2_ = st.columns(2)
     with col1_:
-        with st.beta_expander("Nombre d'erreurs par fonction"):
+        with st.expander("Nombre d'erreurs par fonction"):
             st.dataframe(error_count_by_function)
 
     with col2_:
-        with st.beta_expander("Comparaison avec diagrammes à barres"):
+        with st.expander("Comparaison avec diagrammes à barres"):
             error_count_by_function = error_count_by_function[
                 error_count_by_function["error_message"]>0]
             bar_fig = px.bar(
@@ -104,7 +104,7 @@ def app():
                 y=["error_message"])
             st.plotly_chart(bar_fig, use_container_width=True)
 
-    with st.beta_expander("Pie chart comparison"):
+    with st.expander("Pie chart comparison"):
         error_count = error_data.groupby(
             ['function_name']).count()[["error_message"]].reset_index()
         error_count = error_count[error_count["error_message"]>0]
@@ -119,10 +119,10 @@ def app():
 
     st.subheader("Quels sont les messages d'erreur ?")
 
-    with st.beta_expander("Détail des erreurs"):
+    with st.expander("Détail des erreurs"):
         st.dataframe(error_count_by_message)
 
-    with st.beta_expander("Pie chart comparison"):
+    with st.expander("Pie chart comparison"):
         pie_fig2 = px.pie(
             error_count_by_message,
             values='counts',
@@ -138,14 +138,14 @@ def app():
         'function_name', 'error_message', 'error_level']).count()[["url"]]
     log_data_grouped = log_data_grouped[log_data_grouped["url"]>1]
     log_data_grouped = log_data_grouped.sort_values(by="url", ascending=False)
-    with st.beta_expander("Fonction avec son message d'erreur"):
+    with st.expander("Fonction avec son message d'erreur"):
         st.dataframe(log_data_grouped)
 
     st.subheader("A quelles urls sont liés les messages d'erreur de diffbot ?")
 
     problematic_urls = log_data["url"][log_data["error_message"].str.contains(
         "objects", na=False)]
-    with st.beta_expander("Urls problématiques"):
+    with st.expander("Urls problématiques"):
         st.write("len:", len(problematic_urls))
         for url in problematic_urls:
             st.write(url)
@@ -153,7 +153,7 @@ def app():
     st.header("Étude du temps d'execution des fonctions :hourglass:")
     st.subheader("Temps global d'execution :hourglass:")
 
-    with st.beta_expander("Distribution du temps (en secondes) de la fonction principale"):
+    with st.expander("Distribution du temps (en secondes) de la fonction principale"):
         main_function_data = log_data[log_data["function_name"].isin(
             ["get_product_vs_replicas"])]
 
@@ -164,7 +164,7 @@ def app():
 
     st.subheader('Diffbot vs Scraper maison')
 
-    with st.beta_expander("Distribution du temps (en secondes) de la fonction diffbot et de la fonction de scraping maison"):
+    with st.expander("Distribution du temps (en secondes) de la fonction diffbot et de la fonction de scraping maison"):
 
         diffbot_data = log_data["process_time"][log_data["function_name"].isin(
             ["data_Diffbot"])].to_list()
@@ -178,7 +178,7 @@ def app():
 
     st.subheader("Temps d'execution de la fonction de scraping maison")
 
-    with st.beta_expander("Distribution du temps (en secondes) de chaque fonction qui compose la fonction de scraping maison."):
+    with st.expander("Distribution du temps (en secondes) de chaque fonction qui compose la fonction de scraping maison."):
         
         old_sc_func_1 = log_data["process_time"][log_data["function_name"].isin(
             ["get_name"])].to_list()
@@ -197,7 +197,7 @@ def app():
 
     st.subheader('Aliexpress vs Google')
 
-    with st.beta_expander("Distribution du temps (en secondes) des fonctions du collecteur de répliques"):
+    with st.expander("Distribution du temps (en secondes) des fonctions du collecteur de répliques"):
         
         func_1 = log_data["process_time"][log_data["function_name"].isin(
             ["data_Aliexpress"])].to_list()
@@ -211,7 +211,7 @@ def app():
 
     st.subheader('Google Vision')
     
-    with st.beta_expander("Distribution du temps (en secondes) de la fonction de classification d'image de google"):
+    with st.expander("Distribution du temps (en secondes) de la fonction de classification d'image de google"):
         
         goo_func_1 = log_data["process_time"][log_data["function_name"].isin(
             ["dataset_Google_Vision"])].to_list()
