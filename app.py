@@ -19,14 +19,14 @@ PAGES = {
 }
 
 st.sidebar.title("Lang 🌍")
-lang_option = st.sidebar.selectbox("", ("FR", "EN"))
+lang_option = st.sidebar.selectbox("Onglets", ("FR", "EN"))
 if lang_option == "FR":
     st.sidebar.title('Navigation')
-    selection = st.sidebar.radio("", list(PAGES["FR"].keys()))
+    selection = st.sidebar.radio("Onglets", list(PAGES["FR"].keys()))
     page = PAGES["FR"][selection]
     page.app()
 else:
     st.sidebar.title('Navigation')
-    selection = st.sidebar.radio("", list(PAGES["EN"].keys()))
+    selection = st.sidebar.radio("Onglets", list(PAGES["EN"].keys()))
     page = PAGES["EN"][selection]
     page.app()
