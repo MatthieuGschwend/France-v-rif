@@ -1,15 +1,31 @@
-import interface
-import log_analysis
+import interface_fr
+import log_analysis_en
 import streamlit as st
 
 
 st.set_page_config(layout="wide")
 PAGES = {
-    "Log analysis": log_analysis,
-    "Analyse des données": interface
+    "FR":
+    {
+        "Log analysis": log_analysis_en,
+        "Analyse des données": interface_fr
+    },
+    "EN":
+    {
+        "Log analysis": log_analysis_en,
+        "Analyse des données": interface_fr
+    }
 }
 
-st.sidebar.title('Navigation')
-selection = st.sidebar.radio("Onglets", list(PAGES.keys()))
-page = PAGES[selection]
-page.app()
+st.sidebar.title("Lang 🌍")
+lang_option = st.sidebar.selectbox("", ("FR", "EN"))
+if lang_option == "FR":
+    st.sidebar.title('Navigation')
+    selection = st.sidebar.radio("Onglets", list(PAGES["FR"].keys()))
+    page = PAGES["FR"][selection]
+    page.app()
+else:
+    st.sidebar.title('Navigation')
+    selection = st.sidebar.radio("Onglets", list(PAGES["EN"].keys()))
+    page = PAGES["EN"][selection]
+    page.app()
