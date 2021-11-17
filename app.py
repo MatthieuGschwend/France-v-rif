@@ -1,4 +1,5 @@
 import interface_fr
+import interface_en
 import log_analysis_en
 import log_analysis_fr
 import streamlit as st
