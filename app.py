@@ -19,7 +19,7 @@ PAGES = {
     }
 }
 
-st.sidebar.image(".image\logo.png", width=100)
+st.sidebar.image("/image/logo.png", width=100)
 
 st.sidebar.title("Lang 🌍")
 lang_option = st.sidebar.selectbox("Onglets", ("FR", "EN"))
