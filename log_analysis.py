@@ -15,7 +15,7 @@ def app():
 
     st.header('Study of errors :microscope:')
 
-    # Filter to keep only errors and not warnings
+    # Filter to keep only the errors and not the warnings
     error_data = log_data[log_data["error_level"].isin(["error"])]
 
     # Cleaning to regroup the same message errors written diffrently
@@ -34,6 +34,7 @@ def app():
         *100/len(log_data["url"].unique())
 
     st.subheader('Success/Fail rate')
+
     fail_rate = error_count_by_message["percentage_over_all_urls"].sum()
     success_rate = 100 - fail_rate
 
@@ -46,6 +47,7 @@ def app():
     st.plotly_chart(fig, use_container_width=True)
 
     st.subheader('Raw Data')
+
     col1, col2 = st.columns(2)
     with col1:
         with st.expander("log.csv"):
@@ -80,6 +82,7 @@ def app():
             st.markdown(body, unsafe_allow_html=False)
 
     st.subheader('Error counts')
+
     error_count_by_function = error_data.groupby(
         ['function_name']).count()[["error_message"]]
     error_count_by_function = error_count_by_function.sort_values(
@@ -114,6 +117,7 @@ def app():
         st.plotly_chart(pie_fig, use_container_width=True)
 
     st.subheader('What are the error messages?')
+
     with st.expander("Errors detail"):
         st.dataframe(error_count_by_message)
 
@@ -126,14 +130,17 @@ def app():
         st.plotly_chart(pie_fig2, use_container_width=True)
 
     st.subheader('To which function is the error message linked?')
+
     log_data_grouped = log_data[~log_data["error_message"].str.contains(
         "/shopping/product/", na=False)]
     log_data_grouped = log_data_grouped.groupby([
         'function_name', 'error_message', 'error_level']).count()[["url"]]
+    log_data_grouped = log_data_grouped.sort_values(by="url", ascending=False)
     with st.expander("Function with its error message"):
         st.dataframe(log_data_grouped)
 
     st.subheader('To which urls are the diffbot error messages linked?')
+
     problematic_urls = log_data["url"][log_data["error_message"].str.contains(
         "objects", na=False)]
     with st.expander("Problematic urls"):
@@ -143,6 +150,7 @@ def app():
 
     st.header('Study of processing time of functions :hourglass:')
     st.subheader('Global time taken')
+
     with st.expander("Time (in second) distribution of the main function"):
         main_function_data = log_data[log_data["function_name"].isin(
             ["get_product_vs_replicas"])]
@@ -153,6 +161,7 @@ def app():
         st.plotly_chart(fig1, use_container_width=True)
 
     st.subheader('Diffbot vs Old scraper')
+
     with st.expander("Time (in second) distribution of the diffbot function and old scraper function"):
 
         diffbot_data = log_data["process_time"][log_data["function_name"].isin(
@@ -166,6 +175,7 @@ def app():
         st.plotly_chart(fig2, use_container_width=True)
 
     st.subheader('Old scraper detail processing time')
+
     with st.expander("Time (in second) distribution of each function that compose old scraper function"):
         
         old_sc_func_1 = log_data["process_time"][log_data["function_name"].isin(
@@ -184,6 +194,7 @@ def app():
         st.plotly_chart(fig3, use_container_width=True)
 
     st.subheader('Aliexpress vs Google')
+
     with st.expander("Time (in second) distribution of the replicas collector functions"):
         
         func_1 = log_data["process_time"][log_data["function_name"].isin(
@@ -197,6 +208,7 @@ def app():
         st.plotly_chart(fig4, use_container_width=True)
 
     st.subheader('Google Vision')
+    
     with st.expander("Time (in second) distribution of the google image classification function"):
         
         goo_func_1 = log_data["process_time"][log_data["function_name"].isin(
