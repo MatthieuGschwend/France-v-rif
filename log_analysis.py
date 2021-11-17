@@ -2,8 +2,12 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.figure_factory as ff
+import plotly.graph_objects as go
+
 
 colors = ['#393E46', '#2BCDC1', '#F66095', '#F7CC57']
+log_data = pd.read_csv("log.csv")
+
 
 def app():
 
@@ -11,8 +15,36 @@ def app():
 
     st.header('Study of errors :microscope:')
 
+    # Filter to keep only errors and not warnings
+    error_data = log_data[log_data["error_level"].isin(["error"])]
+
+    # Cleaning to regroup the same message errors written diffrently
+    error_data["error_message"] = error_data["error_message"].str.split(", url=URL").str[0]
+    error_data["error_message"] = error_data["error_message"].str.split("byte").str[0]
+
+    # Count of each error occurence
+    error_count_by_message = error_data['error_message'].value_counts()
+    error_count_by_message = error_count_by_message.rename_axis('error_message')
+    error_count_by_message = error_count_by_message.reset_index(name='counts')
+    error_count_by_message = error_count_by_message[
+        error_count_by_message["counts"]>0]
+
+    # Percentage of occurence of each error
+    error_count_by_message["percentage_over_all_urls"] = error_count_by_message["counts"] \
+        *100/len(log_data["url"].unique())
+
+    st.subheader('Success/Fail rate')
+    fail_rate = error_count_by_message["percentage_over_all_urls"].sum()
+    success_rate = 100 - fail_rate
+
+    labels = ['Success','Fail']
+    values = [success_rate, fail_rate]
+
+    # Use `hole` to create a donut-like pie chart
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
+    st.plotly_chart(fig, use_container_width=True)
+
     st.subheader('Raw Data')
-    log_data = pd.read_csv("log.csv")
     col1, col2 = st.columns(2)
     with col1:
         with st.expander("log.csv"):
@@ -47,7 +79,7 @@ def app():
             st.markdown(body, unsafe_allow_html=False)
 
     st.subheader('Error counts')
-    error_count_by_function = log_data.groupby(
+    error_count_by_function = error_data.groupby(
         ['function_name']).count()[["error_message"]]
     error_count_by_function = error_count_by_function.sort_values(
         by='error_message', ascending=False)
@@ -68,7 +100,7 @@ def app():
             st.plotly_chart(bar_fig, use_container_width=True)
 
     with st.expander("Pie chart comparison"):
-        error_count = log_data.groupby(
+        error_count = error_data.groupby(
             ['function_name']).count()[["error_message"]].reset_index()
         error_count = error_count[error_count["error_message"]>0]
 
@@ -80,17 +112,8 @@ def app():
 
         st.plotly_chart(pie_fig, use_container_width=True)
 
-
-    log_data["error_message"] = log_data["error_message"].str.split(", url=URL").str[0]
-    log_data["error_message"] = log_data["error_message"].str.split("byte").str[0]
-
     st.subheader('What are the error messages?')
     with st.expander("Errors detail"):
-        error_count_by_message = log_data['error_message'].value_counts()
-        error_count_by_message = error_count_by_message.rename_axis('error_message')
-        error_count_by_message = error_count_by_message.reset_index(name='counts')
-        error_count_by_message = error_count_by_message[
-            error_count_by_message["counts"]>1]
         st.dataframe(error_count_by_message)
 
     with st.expander("Pie chart comparison"):
@@ -100,14 +123,6 @@ def app():
             names="error_message",
             title='Error count by message error')
         st.plotly_chart(pie_fig2, use_container_width=True)
-
-    st.subheader('On what proportion do the error occurs?')
-    error_count_by_message["percentage_over_all_urls"] = error_count_by_message["counts"] \
-        *100/len(log_data["url"].unique())
-
-    with st.expander("Percentage of occurence"):
-        st.dataframe(error_count_by_message[[
-        "error_message", "percentage_over_all_urls"]])
 
     st.subheader('To which function is the error message linked?')
     log_data_grouped = log_data[~log_data["error_message"].str.contains(
@@ -202,10 +217,4 @@ def app():
         * **data_Google_Vision**: when the google image
         classification function is called only for one image. Called for the
         product page image classification.
-        """)
-
-    st.subheader('TO DO')
-    with st.expander("Expand"):
-        st.write("""Ajouter pie chart comparaison Succès vs Echec pour
-        remplace "On what proportion do the error occurs?"
         """)
