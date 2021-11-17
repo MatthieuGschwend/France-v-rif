@@ -5,7 +5,7 @@ import plotly.figure_factory as ff
 import plotly.graph_objects as go
 
 
-colors = ['#393E46', '#2BCDC1', '#F66095', '#F7CC57']
+colors = ['#2BCDC1', '#393E46', '#F7CC57', '#F66095']
 log_data = pd.read_csv("log.csv")
 
 
@@ -42,6 +42,7 @@ def app():
 
     # Use `hole` to create a donut-like pie chart
     fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
+    fig.update_traces(marker=dict(colors=colors))
     st.plotly_chart(fig, use_container_width=True)
 
     st.subheader('Raw Data')
