@@ -28,13 +28,13 @@ def app():
     def mois_annees(nb_mois):
         nb_annes = int(nb_mois/12.)
         nb_mois_ = int(nb_mois) % 12
-        an = ' an'
+        an = 'year '
         if nb_annes > 1:
-            an = ' ans'
+            an = ' years'
         if nb_mois_ == 0:
             return str(nb_annes) + an
         else:
-            return str(nb_annes) + an + ' et ' + str(nb_mois_) + ' mois'
+            return str(nb_annes) + an + ' and ' + str(nb_mois_) + ' month'
 
     def liste_item(data):
         '''renvoie la liste des items '''
@@ -58,9 +58,9 @@ def app():
 
     def boolean_string(oui_ou_non):
         if(oui_ou_non == 1):
-            return 'Oui'
+            return 'Yes'
         else : 
-            return 'Non'
+            return 'No'
 
     def affichage_image(data_item):
         try:
@@ -72,7 +72,7 @@ def app():
     def affichage_prix(data_item):
         try:
             product_prix = str(data_item['product price'].values[0])
-            return st.markdown('- Prix : ' + product_prix +' euros' )
+            return st.markdown('- Price : ' + product_prix +' euros' )
         except:
             pass
 
@@ -80,7 +80,7 @@ def app():
         try:
             product_web_site  = data_item['product domain'].values[0]
             product_web_site = "["+product_web_site +"]" + '(https://' + product_web_site + ')'
-            return st.markdown('- Site web : ' + product_web_site)
+            return st.markdown('- Web Site : ' + product_web_site)
         except:
             pass
 
@@ -96,7 +96,7 @@ def app():
         try:
             product_age_months = data_item['product website_age_in_months']\
                                      .values[0]
-            return st.markdown('- Ancienneté : ' + mois_annees(product_age_months))
+            return st.markdown('- Age : ' + mois_annees(product_age_months))
         except:
             pass
 
@@ -110,14 +110,14 @@ def app():
     def affichage_green(data_item):
         try:
             product_green = data_item['product is_green_website'].values[0]
-            return st.markdown('- Fiable : ' + boolean_string(product_green))
+            return st.markdown('- Reliable : ' + boolean_string(product_green))
         except:
             pass
 
     def affichage_classe(data_item):
         try:
             product_class = data_item['product class'].values[0]
-            return st.markdown('- Classe de produit : ' + product_class)
+            return st.markdown('- Product class : ' + product_class)
         except:
             pass
 
@@ -142,7 +142,7 @@ def app():
             replica_prix = data_item[data_item['replica name']==replica_name]\
                 ['replica price'].values[0]
             replica_prix = str(replica_prix)
-            return st.markdown('- Prix : ' + replica_prix +' euros')
+            return st.markdown('- Price : ' + replica_prix +' euros')
         except:
             pass
 
@@ -151,7 +151,7 @@ def app():
             replica_site = data_item[data_item['replica name']==replica_name]\
                 ['replica domain'].values[0]
             replica_site = "["+replica_site +"]" + '(https://' + replica_site + ')'
-            return st.markdown('- Site web : ' + replica_site)
+            return st.markdown('- Web site : ' + replica_site)
         except:
             pass
 
@@ -159,7 +159,7 @@ def app():
         try:
             replica_url = data_item[data_item['replica name']==replica_name]\
                 ['replica url'].values[0]
-            replica_url = "[Lien de la réplica]" + '(' + replica_url + ')'
+            replica_url = "[replica link]" + '(' + replica_url + ')'
             return st.markdown(replica_url)
         except:
             pass
@@ -169,7 +169,7 @@ def app():
         try:
             replica_age = data_item[data_item['replica name']==replica_name]\
                 ['replica website_age_in_months'].values[0]
-            return st.markdown('- Ancienneté : ' + mois_annees(replica_age))
+            return st.markdown('- Age : ' + mois_annees(replica_age))
         except:
             pass
 
@@ -185,7 +185,7 @@ def app():
         try:
             replica_green = data_item[data_item['replica name']==replica_name]\
                 ['replica is_green_website'].values[0]
-            return st.markdown('- Fiable : ' + boolean_string(replica_green))
+            return st.markdown('- Green web site : ' + boolean_string(replica_green))
         except:
             pass
 
@@ -253,13 +253,13 @@ def app():
         age_article = [age_article(nom, data) for nom in liste_item]
         article_prix = [prix_article(nom, data) for nom in liste_item]
 
-        df = pd.DataFrame({'Nom_item':liste_item,
-                               'Ecart prix relatif': prix_moyen,
-                               'Proportion Green Web Site réplicas': green_moyen, 
-                               'Proportion Shopify réplicas': shopify_moyen,
-                               'Classe du produit' : label_item,
-                               'Age du produit' : age_article,
-                               'Prix du produit': article_prix
+        df = pd.DataFrame({'Product name':liste_item,
+                               'Relative price differential': prix_moyen,
+                               'Proportion Green Web Site replicas': green_moyen, 
+                               'Proportion Shopify replicas': shopify_moyen,
+                               'Product class' : label_item,
+                               'Age' : age_article,
+                               'Product price': article_prix
                                })
 
         # fig = px.box(df, x="Classe du produit", y="Porportion Shopify",color = "Classe du produit")
@@ -269,10 +269,10 @@ def app():
         return df
 
     def vue_ensemble_data(data_classe, prix_min, prix_max):
-        data_ = data_classe[data_classe['Prix du produit'] > prix_min]
-        data_ = data_[data_['Prix du produit'] < prix_max]
-        fig = px.scatter(data_, x='Prix du produit', y='Age du produit',
-                         color='Classe du produit',
+        data_ = data_classe[data_classe['Product price'] > prix_min]
+        data_ = data_[data_['Product price'] < prix_max]
+        fig = px.scatter(data_, x='Product price', y='Age',
+                         color='Product class',
                          marginal_y="box", marginal_x="box", 
                          trendline="ols", template="simple_white",
                          color_discrete_sequence=['grey','green','orange'])
@@ -283,8 +283,8 @@ def app():
         ''' Raport de corrélation entre une variable qualitative x et quantitative y'''
         moyenne = data_classe[var_qualitative].mean()
         classes = []
-        for classe in data_classe['Classe du produit'].unique():
-            val_classe = data_classe[data_classe['Classe du produit'] == classe][var_qualitative]
+        for classe in data_classe['Product class'].unique():
+            val_classe = data_classe[data_classe['Product class'] == classe][var_qualitative]
             classes.append({'ni': len(val_classe),
                             'moyenne_classe': val_classe.mean()})
         SCT = sum([(yj-moyenne)**2 for yj in data_classe[var_qualitative]])
@@ -307,42 +307,25 @@ def app():
         #st.title('Visualisation du data frame')
         data = load_data()
 
-        # Définition de la langue :
-        #st.write(data)
 
-        #st.sidebar.checkbox("Présentation")
-        # Sélection du type d'analyse générale à effectuer
-        #types_analyse = {"Mots clés génériques": data[dossiers_source[0]],
-        #"Destinations Françaises": data[dossiers_source[1]],
-        #"Destinations Françaises et Européennes": data[dossiers_source[2]]}
-        #txt = "Types d'analyses: " 
-        #noms_types = list(types_analyse.keys())
-
-
-        #liste_items = liste_item(data)
-        #mode = st.sidebar.selectbox('Liste des items',liste_items )
-        # Barre de texte  : texte input
-        #recherche = st.text_input("un test text_input")
-
-
-        if st.sidebar.checkbox("Analyse par produit"):
+        if st.sidebar.checkbox("Collected data"):
 
             #mode = st.sidebar.selectbox('Liste des items',np.insert(liste_items,0," "))
-            st.title("Analyse par produit")
+            st.title("Collected data")
             #st.write(data_item)
             #st.subheader(str(mode))
             col1, col2 = st.columns(2)
             with col1:
-                st.header('Produit initial')
+                st.header('Initial product')
                 liste_items = liste_item(data)
-                mode = st.selectbox('Liste des produits', liste_items)
-                data_item = data[data['product name'] == mode]
+                mode = st.selectbox('Produits list', liste_items)
+                data_item = data[data['Product name'] == mode]
                 affichage_image(data_item)
 
             with col2:
-                st.header('Réplicas')
+                st.header('Replicas')
                 liste_replicas = liste_replica(data_item)
-                replica_name = st.selectbox('Liste des réplicas', liste_replicas)
+                replica_name = st.selectbox('Replicas list', liste_replicas)
                 affichage_replica_image(data_item,replica_name)
 
 
@@ -369,28 +352,28 @@ def app():
 
 
 
-            st.header("Informations sur l'ensemble des réplicas")
+            st.header("Information on all replicas")
             col5, col6 = st.columns([1, 2])
             with col5:
-                st.markdown('- Nombe de réplicas : ' +  str(round(data_item.shape[0],2)))
-                st.markdown('- Prix moyen : ' +  str(round(data_item['replica price'].mean(),2)) )
+                st.markdown('-  Number of replicas : ' +  str(round(data_item.shape[0],2)))
+                st.markdown('- Average price : ' +  str(round(data_item['replica price'].mean(),2)) )
                 st.markdown('- Green site web (%) : '  + 
                         str(round(data_item['replica is_green_website'].mean() * 100,2)))
-                st.markdown('- Affluence moyenne : ' +  str(round(data_item['rank'].mean(),2)))
+                st.markdown('- Average attendance : ' +  str(round(data_item['rank'].mean(),2)))
 
             with col6:
-                genre = st.radio("Visualisation complémentaire",('Domaines', 
-                                                                 'Affluence/Prix/Ancienneté', 'Images'))
+                genre = st.radio("Additional visualization",('Domains', 
+                                                                 'Affluence/Price/Age', 'Images'))
             if genre == 'Domaines':
                 nb_domaine_replica = data_item["replica domain"].value_counts().reset_index()            
                 #camembert(nb_domaine_replica,'index','replica domain')
-                fig = px.pie(nb_domaine_replica, values = 'replica domain', names = 'index', title= 'Domaine des réplicas')
+                fig = px.pie(nb_domaine_replica, values = 'replica domain', names = 'index', title= 'Replica domain')
                 st.plotly_chart(fig, use_container_width=True)
             if genre == 'Images':
                 liste_images_url = data_item['replica image'].tolist()
                 st.image(liste_images_url, width = 100)
 
-            if genre == 'Affluence/Prix/Ancienneté':
+            if genre == 'Affluence/Price/Age':
                 data_affluence = data_item
                 data_affluence["replica is_green_website"] = [boolean_string(green) for
                                                               green in data_item["replica is_green_website"]]
@@ -398,10 +381,10 @@ def app():
                 data_affluence['replica website_age_in_months'] = \
                     [round(age/12.,2) for age in data_item['replica website_age_in_months']]
                 fig = px.scatter(data_affluence,
-                                 labels = {"replica price": 'Prix de la réplica',
-                                          "replica website_age_in_months" : 'Ancienneté de la réplica (années)',
-                                          "replica is_green_website" : "Le site de la réplica est Green",
-                                          "rank" : "Popularité du site"
+                                 labels = {"replica price": 'Replica price',
+                                          "replica website_age_in_months" : 'Web site age (year)',
+                                          "replica is_green_website" : "Replica is green web site",
+                                          "rank" : "Site afluence"
                                      },
                                  x="replica price",
                                  y="replica website_age_in_months",
@@ -410,30 +393,15 @@ def app():
                                  title= 'Ancienneté, prix et afluence des réplicas',
                                  hover_name="replica domain", log_x=True, size_max=40)
                 st.plotly_chart(fig, use_container_width=True)
-                st.write("Les cercles représentent l'ensemble des réplicas du produit" + \
-                         " . La taille des cercles est définie selon l'afluence des sites" + \
-                             " marchants, la couleur indique si le site est" + \
-                             " fiable (Green) ou non." )
+                st.write("The circles represent all the replicas of the product" + \
+                         ". The size of the circles is defined according to the afluence of the sites" + \
+                             ",  the color indicates if the site is" + \
+                             " reliable (Green) or not." )
 
 
-            #product_image = data_item['product image'][0]
-            #product_web_site  = data_item['product domain'][0]
-            #product_prix = str(data_item['product price'][0])
-            #product_shopify = data_item['product is_shopify'][0]
-            #product_age_months = str(data_item['product website_age_in_months'][0]) 
-
-            #product_lien_url = '['+product_web_site+']' + '('+product_web_site+')'
-            #st.image(product_image, width = 200)
-            #try :
-                #st.markdown(product_lien_url)
-            #except :
-                #pass
-
-
-
-        if st.sidebar.checkbox("Analyse par Classe de produit"):
-            st.title('Analyse par Classe de produit')
-            st.subheader('Distribution des prix et anciennetés des produits selon la Classe')
+        if st.sidebar.checkbox("Analysis by Product Class"):
+            st.title('Analysis by Product Class')
+            st.subheader('Price distribution and age of products by class')
             data_classe = classe_anova_replica(data)
 
             col_bar1, col_bar2 = st.columns([1,2])       
@@ -444,20 +412,19 @@ def app():
 
             vue_ensemble_data(data_classe,masque_prix[0],masque_prix[1])
             box_lien = "[box plot]" + '( https://en.wikipedia.org/wiki/Box_plot )'
-            regression_lien = "[régression]" + '(https://en.wikipedia.org/wiki/Linear_regression )'
+            regression_lien = "[regression]" + '(https://en.wikipedia.org/wiki/Linear_regression )'
 
-            st.markdown("Chaque point représente l'ancienneté et le prix d'un produit, les couleurs représentent les" +
-                     " differentes Classes. Une droite de "+regression_lien+" est tracée afin" +
-                     " d'exprimer les tendances générales")
-            st.markdown("- Droite : répartition de l'ancienneté des produits par un " + box_lien)
-            st.markdown("- Haut : répartition du prix du produit par un  "+ box_lien)
+            st.markdown("Each dot represents the age and price of a product, the colors represent the" +
+                     " different classes. A "+regression_lien+" line is drawn to express the general trends")
+            st.markdown("- Right: distribution of the age of the products by a  " + box_lien)
+            st.markdown("- Top: distribution of the product price by a "+ box_lien)
 
-            st.subheader('Caractéristiques des sites réplicas selon la Classe du produit')
-            mode = st.radio("Type d'analyse", ['Proportion Green Web Site réplicas',
-                                                           'Proportion Shopify réplicas'])
+            st.subheader('Characteristics of the replica sites according to the product class')
+            mode = st.radio("Type of analysis", ['Proportion Green Web Site replicas',
+                                                           'Proportion Shopify replicas'])
             #'Ecart prix relatif' possible dans la select box mais Nan 
 
-            fig = px.box(data_classe, y="Classe du produit", x= mode ,color = "Classe du produit",
+            fig = px.box(data_classe, y="Product class", x= mode ,color = "Product class",
                          color_discrete_sequence=['grey','green','orange'],
                          orientation = 'h',
                          points = 'all')
