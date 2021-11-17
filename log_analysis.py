@@ -43,7 +43,8 @@ def app():
 
     # Use `hole` to create a donut-like pie chart
     fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
-    fig.update_traces(marker=dict(colors=colors))
+    fig.update_traces(marker=dict(
+        colors=colors))
     st.plotly_chart(fig, use_container_width=True)
 
     st.subheader('Raw Data')
@@ -131,7 +132,7 @@ def app():
 
     st.subheader('To which function is the error message linked?')
 
-    log_data_grouped = log_data[~log_data["error_message"].str.contains(
+    log_data_grouped = error_data[~error_data["error_message"].str.contains(
         "/shopping/product/", na=False)]
     log_data_grouped = log_data_grouped.groupby([
         'function_name', 'error_message', 'error_level']).count()[["url"]]
