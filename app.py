@@ -1,5 +1,6 @@
 import interface_fr
 import log_analysis_en
+import log_analysis_fr
 import streamlit as st
 
 
@@ -7,7 +8,7 @@ st.set_page_config(layout="wide")
 PAGES = {
     "FR":
     {
-        "Log analysis": log_analysis_en,
+        "Log analysis": log_analysis_fr,
         "Analyse des données": interface_fr
     },
     "EN":
