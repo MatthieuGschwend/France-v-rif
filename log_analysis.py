@@ -135,6 +135,7 @@ def app():
         "/shopping/product/", na=False)]
     log_data_grouped = log_data_grouped.groupby([
         'function_name', 'error_message', 'error_level']).count()[["url"]]
+    log_data_grouped = log_data_grouped[log_data_grouped["url"]>1]
     log_data_grouped = log_data_grouped.sort_values(by="url", ascending=False)
     with st.expander("Function with its error message"):
         st.dataframe(log_data_grouped)
