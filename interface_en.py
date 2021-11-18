@@ -319,7 +319,7 @@ def app():
                 st.header('Initial product')
                 liste_items = liste_item(data)
                 mode = st.selectbox('Produits list', liste_items)
-                data_item = data[data['Product name'] == mode]
+                data_item = data[data['product name'] == mode]
                 affichage_image(data_item)
 
             with col2:
