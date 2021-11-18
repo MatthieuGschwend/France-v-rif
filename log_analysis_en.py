@@ -152,15 +152,13 @@ def app():
         st.plotly_chart(pie_fig2, use_container_width=True)
 
     st.subheader("Try the product page scraping functions")
-    
-    query = st.text_input("Product page url")
-    if query:
-        st.success("Ok !")
-    function_test_col1, function_test_col2 = st.columns(2)
+
+    query = st.text_input("Url de la page produit")
+    function_test_col1, function_test_col2 = st.beta_columns(2)
     with function_test_col1:
         st.subheader("Diffbot")
-        key_diffbot = st.text_input("Diffbot API key")
-        if key_diffbot and query:
+        key_diffbot = "9a98f884113fbc6864d6b5c56276d4d8"
+        if query:
             with st.spinner('Wait for it...'):
                 start_time = time.time()
                 params = {'token':key_diffbot, 'url':query, 'timeout':30000}
@@ -173,12 +171,13 @@ def app():
                 st.write(res.json())
 
     with function_test_col2:
-        st.subheader("Scraper maison")
+        st.subheader("Homemade scraper")
 
     problematic_urls = log_data["url"][log_data["error_message"].str.contains(
         "objects", na=False)]
-    with st.expander("Problematic urls"):
-        st.write("len:", len(problematic_urls))
+    with st.beta_expander("Urls problématiques"):
+        st.write("total urls:", len(log_data))
+        st.write("total problematic_urls:", len(problematic_urls))
         for url in problematic_urls:
             st.write(url)
 
