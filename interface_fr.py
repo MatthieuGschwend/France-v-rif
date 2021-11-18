@@ -316,9 +316,9 @@ def app():
         #mode = st.sidebar.selectbox('Liste des items',liste_items )
         # Barre de texte  : texte input
         #recherche = st.text_input("un test text_input")
-
-
-        if st.sidebar.checkbox("Analyse par produit"):
+        
+        
+        if st.sidebar.checkbox("Analyse par produit", value=True):
 
             #mode = st.sidebar.selectbox('Liste des items',np.insert(liste_items,0," "))
             st.title("Analyse par produit")
