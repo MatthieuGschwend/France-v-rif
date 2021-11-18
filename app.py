@@ -9,13 +9,13 @@ st.set_page_config(layout="wide")
 PAGES = {
     "FR":
     {
-        "Log analysis": log_analysis_fr,
+        "Analyse des processus de collecte de données": log_analysis_fr,
         "Analyse des données": interface_fr
     },
     "EN":
     {
-        "Log analysis": log_analysis_en,
-        "Analyse des données": interface_en
+        "Analysis of data collection processes": log_analysis_en,
+        "Data analysis": interface_en
     }
 }
 
