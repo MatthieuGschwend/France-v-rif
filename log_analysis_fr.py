@@ -113,7 +113,7 @@ def app():
             error_count,
             values='error_message',
             names="function_name",
-            title="Nombre d'erreurs par fonction")
+            title="Taux d'erreurs par fonction")
 
         st.plotly_chart(pie_fig, use_container_width=True)
 
@@ -127,7 +127,7 @@ def app():
             error_count_by_message,
             values='counts',
             names="error_message",
-            title="Nombre d'erreurs par message d'erreur")
+            title="Taux d'erreurs par message d'erreur")
         st.plotly_chart(pie_fig2, use_container_width=True)
 
     st.subheader("À quelle fonction le message d'erreur est-il lié ?")
