@@ -308,7 +308,7 @@ def app():
         data = load_data()
 
 
-        if st.sidebar.checkbox("Collected data"):
+        if st.sidebar.checkbox("Collected data", value=True):
 
             #mode = st.sidebar.selectbox('Liste des items',np.insert(liste_items,0," "))
             st.title("Collected data")
