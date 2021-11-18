@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import requests
+import time
 import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
@@ -149,7 +151,29 @@ def app():
             names="error_message")
         st.plotly_chart(pie_fig2, use_container_width=True)
 
-    st.subheader('To which urls are the diffbot error messages linked?')
+    st.subheader("Try the product page scraping functions")
+    
+    query = st.text_input("Product page url")
+    if query:
+        st.success("Ok !")
+    function_test_col1, function_test_col2 = st.columns(2)
+    with function_test_col1:
+        st.subheader("Diffbot")
+        key_diffbot = st.text_input("Diffbot API key")
+        if key_diffbot and query:
+            with st.spinner('Wait for it...'):
+                start_time = time.time()
+                params = {'token':key_diffbot, 'url':query, 'timeout':30000}
+                endpoint = "https://api.diffbot.com/v3/product"
+                res = requests.get(endpoint, params=params)
+                end_time = time.time()
+                exec_time = end_time - start_time
+                exec_time = round(exec_time, 2)
+                st.write(f"Execution time :", exec_time, " seconds")
+                st.write(res.json())
+
+    with function_test_col2:
+        st.subheader("Scraper maison")
 
     problematic_urls = log_data["url"][log_data["error_message"].str.contains(
         "objects", na=False)]
