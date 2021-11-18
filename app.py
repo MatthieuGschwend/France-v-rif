@@ -22,7 +22,7 @@ PAGES = {
 st.sidebar.image("logo.png", width=100)
 
 st.sidebar.title("Lang 🌍")
-lang_option = st.sidebar.selectbox("Onglets", ("FR", "EN"))
+lang_option = st.sidebar.selectbox("", ("FR", "EN"))
 if lang_option == "FR":
     st.sidebar.title('Navigation')
     selection = st.sidebar.radio("Onglets", list(PAGES["FR"].keys()))
