@@ -185,75 +185,75 @@ def app():
             st.write(url)
 
     st.header("Étude du temps d'execution des fonctions :hourglass:")
+    with st.expander("Déplier"):
+        st.subheader('Diffbot vs Scraper maison')
 
-    st.subheader('Diffbot vs Scraper maison')
+        st.subheader("Distribution du temps (en secondes) de la fonction diffbot et de la fonction de scraping maison")
 
-    st.subheader("Distribution du temps (en secondes) de la fonction diffbot et de la fonction de scraping maison")
+        diffbot_data = log_data["process_time"][log_data["function_name"].isin(
+            ["data_Diffbot"])].to_list()
+        old_scraper_data = log_data["process_time"][log_data["function_name"].isin(
+            ["get_data"])].to_list()
 
-    diffbot_data = log_data["process_time"][log_data["function_name"].isin(
-        ["data_Diffbot"])].to_list()
-    old_scraper_data = log_data["process_time"][log_data["function_name"].isin(
-        ["get_data"])].to_list()
+        hist_data_1 = [diffbot_data, old_scraper_data]
+        group_labels_1 = ["data_Diffbot", "get_data"]
+        fig2 = ff.create_distplot(hist_data_1, group_labels_1, colors=colors)
+        st.plotly_chart(fig2, use_container_width=True)
 
-    hist_data_1 = [diffbot_data, old_scraper_data]
-    group_labels_1 = ["data_Diffbot", "get_data"]
-    fig2 = ff.create_distplot(hist_data_1, group_labels_1, colors=colors)
-    st.plotly_chart(fig2, use_container_width=True)
+        st.subheader("Temps d'execution de la fonction de scraping maison")
 
-    st.subheader("Temps d'execution de la fonction de scraping maison")
+        st.subheader("Distribution du temps (en secondes) de chaque fonction qui compose la fonction de scraping maison.")
+            
+        old_sc_func_1 = log_data["process_time"][log_data["function_name"].isin(
+            ["get_name"])].to_list()
+        old_sc_func_2 = log_data["process_time"][log_data["function_name"].isin(
+            ["get_description"])].to_list()
+        old_sc_func_3 = log_data["process_time"][log_data["function_name"].isin(
+            ["get_price"])].to_list()
+        old_sc_func_4 = log_data["process_time"][log_data["function_name"].isin(
+            ["get_image"])].to_list()
 
-    st.subheader("Distribution du temps (en secondes) de chaque fonction qui compose la fonction de scraping maison.")
+        hist_data_2 = [old_sc_func_1, old_sc_func_2, old_sc_func_3, old_sc_func_4]
+        group_labels_2 = ["get_name", "get_description", "get_price", "get_image"]
+        fig3 = ff.create_distplot(hist_data_2, group_labels_2, bin_size=0.05, colors=colors)
+        fig3.update_xaxes(range=[0, 4])
+        st.plotly_chart(fig3, use_container_width=True)
+
+        st.subheader('Aliexpress vs Google')
+
+        st.subheader("Distribution du temps (en secondes) des fonctions du collecteur de répliques")
+            
+        func_1 = log_data["process_time"][log_data["function_name"].isin(
+            ["data_Aliexpress"])].to_list()
+        func_2 = log_data["process_time"][log_data["function_name"].isin(
+            ["data_Google_combined"])].to_list()
+
+        hist_data_3 = [func_1, func_2]
+        group_labels_3 = ["data_Aliexpress", "data_Google_combined"]
+        fig4 = ff.create_distplot(hist_data_3, group_labels_3, bin_size=0.1, colors=colors)
+        st.plotly_chart(fig4, use_container_width=True)
+
+        st.subheader('Google Vision')
         
-    old_sc_func_1 = log_data["process_time"][log_data["function_name"].isin(
-        ["get_name"])].to_list()
-    old_sc_func_2 = log_data["process_time"][log_data["function_name"].isin(
-        ["get_description"])].to_list()
-    old_sc_func_3 = log_data["process_time"][log_data["function_name"].isin(
-        ["get_price"])].to_list()
-    old_sc_func_4 = log_data["process_time"][log_data["function_name"].isin(
-        ["get_image"])].to_list()
+        st.subheader("Distribution du temps (en secondes) de la fonction de classification d'image de google")
+            
+        goo_func_1 = log_data["process_time"][log_data["function_name"].isin(
+            ["dataset_Google_Vision"])].to_list()
+        goo_func_2 = log_data["process_time"][log_data["function_name"].isin(
+            ["data_Google_Vision"])].to_list()
 
-    hist_data_2 = [old_sc_func_1, old_sc_func_2, old_sc_func_3, old_sc_func_4]
-    group_labels_2 = ["get_name", "get_description", "get_price", "get_image"]
-    fig3 = ff.create_distplot(hist_data_2, group_labels_2, bin_size=0.05, colors=colors)
-    fig3.update_xaxes(range=[0, 4])
-    st.plotly_chart(fig3, use_container_width=True)
+        hist_data_4 = [goo_func_1, goo_func_2]
+        group_labels_4 = ["dataset_Google_Vision", "data_Google_Vision"]
 
-    st.subheader('Aliexpress vs Google')
-
-    st.subheader("Distribution du temps (en secondes) des fonctions du collecteur de répliques")
+        fig5 = ff.create_distplot(hist_data_4, group_labels_4, bin_size=0.1, colors=colors)
+        fig5.update_xaxes(range=[0, 10])
+        st.plotly_chart(fig5, use_container_width=True)
+        st.markdown("""
+        * **dataset_Google_Vision** : lorsque la fonction de classification google image
+        est appelée de manière asynchrone lorsqu'il existe plusieurs
+        plusieurs images. Appelé pour les catégories d'images répliques.
         
-    func_1 = log_data["process_time"][log_data["function_name"].isin(
-        ["data_Aliexpress"])].to_list()
-    func_2 = log_data["process_time"][log_data["function_name"].isin(
-        ["data_Google_combined"])].to_list()
-
-    hist_data_3 = [func_1, func_2]
-    group_labels_3 = ["data_Aliexpress", "data_Google_combined"]
-    fig4 = ff.create_distplot(hist_data_3, group_labels_3, bin_size=0.1, colors=colors)
-    st.plotly_chart(fig4, use_container_width=True)
-
-    st.subheader('Google Vision')
-    
-    st.subheader("Distribution du temps (en secondes) de la fonction de classification d'image de google")
-        
-    goo_func_1 = log_data["process_time"][log_data["function_name"].isin(
-        ["dataset_Google_Vision"])].to_list()
-    goo_func_2 = log_data["process_time"][log_data["function_name"].isin(
-        ["data_Google_Vision"])].to_list()
-
-    hist_data_4 = [goo_func_1, goo_func_2]
-    group_labels_4 = ["dataset_Google_Vision", "data_Google_Vision"]
-
-    fig5 = ff.create_distplot(hist_data_4, group_labels_4, bin_size=0.1, colors=colors)
-    fig5.update_xaxes(range=[0, 10])
-    st.plotly_chart(fig5, use_container_width=True)
-    st.markdown("""
-    * **dataset_Google_Vision** : lorsque la fonction de classification google image
-    est appelée de manière asynchrone lorsqu'il existe plusieurs
-    plusieurs images. Appelé pour les catégories d'images répliques.
-    
-    * **data_Google_Vision** : lorsque la fonction de classification de google image
-    est appelée pour une seule image. Appelé pour la
-    classification des images des pages de produits.
-    """)
+        * **data_Google_Vision** : lorsque la fonction de classification de google image
+        est appelée pour une seule image. Appelé pour la
+        classification des images des pages de produits.
+        """)
