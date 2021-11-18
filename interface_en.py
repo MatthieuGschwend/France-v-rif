@@ -364,7 +364,7 @@ def app():
             with col6:
                 genre = st.radio("Additional visualization",('Domains', 
                                                                  'Affluence/Price/Age', 'Images'))
-            if genre == 'Domaines':
+            if genre == 'Domains':
                 nb_domaine_replica = data_item["replica domain"].value_counts().reset_index()            
                 #camembert(nb_domaine_replica,'index','replica domain')
                 fig = px.pie(nb_domaine_replica, values = 'replica domain', names = 'index', title= 'Replica domain')
