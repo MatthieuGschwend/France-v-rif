@@ -435,7 +435,7 @@ def app():
                         ' its replicas. A point represents this proportion according to the class of the product')
             st.markdown('A '+box_lien+ ' is added to view the statistical indicators')
 
-            calcul_correlation_anova(data_classe,mode)
+            #calcul_correlation_anova(data_classe,mode)
 
     #%%
     ### VII - PROGRAMME PRINCIPAL
