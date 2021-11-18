@@ -154,7 +154,7 @@ def app():
     st.subheader("Try the product page scraping functions")
 
     query = st.text_input("Url de la page produit")
-    function_test_col1, function_test_col2 = st.beta_columns(2)
+    function_test_col1, function_test_col2 = st.columns(2)
     with function_test_col1:
         st.subheader("Diffbot")
         key_diffbot = "9a98f884113fbc6864d6b5c56276d4d8"
@@ -175,7 +175,7 @@ def app():
 
     problematic_urls = log_data["url"][log_data["error_message"].str.contains(
         "objects", na=False)]
-    with st.beta_expander("Urls problématiques"):
+    with st.expander("Urls problématiques"):
         st.write("total urls:", len(log_data))
         st.write("total problematic_urls:", len(problematic_urls))
         for url in problematic_urls:
