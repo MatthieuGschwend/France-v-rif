@@ -87,7 +87,7 @@ def app():
     def affichage_url(data_item):
         try:
             product_url  = data_item['product url'].values[0]
-            product_url = "[Lien du produit]" + '(' + product_url + ')'
+            product_url = "[Product link]" + '(' + product_url + ')'
             return st.markdown(product_url)
         except:
             pass
@@ -359,7 +359,7 @@ def app():
                 st.markdown('- Average price : ' +  str(round(data_item['replica price'].mean(),2)) )
                 st.markdown('- Green site web (%) : '  + 
                         str(round(data_item['replica is_green_website'].mean() * 100,2)))
-                st.markdown('- Average attendance : ' +  str(round(data_item['rank'].mean(),2)))
+                st.markdown('- Average afluence : ' +  str(round(data_item['rank'].mean(),2)))
 
             with col6:
                 genre = st.radio("Additional visualization",('Domains', 
@@ -431,9 +431,9 @@ def app():
             fig.update_traces(quartilemethod="exclusive") # or "inclusive", or "linear" by default
             st.plotly_chart(fig, use_container_width=True)
 
-            st.markdown('Pour un produit nous calculons la proportion de site Green (ou shopify) de' +
-                        ' ses réplicas. Un point représente cette proportion selon la classe du produit')
-            st.markdown('Un '+box_lien+ ' est ajouté pour visualiser les indicateurs statistiques')
+            st.markdown('For a product we calculate the proportion of Green site (or shopify) of ' +
+                        ' its replicas. A point represents this proportion according to the class of the product')
+            st.markdown('A '+box_lien+ ' is added to view the statistical indicators')
 
             calcul_correlation_anova(data_classe,mode)
 
