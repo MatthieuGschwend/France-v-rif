@@ -10,19 +10,19 @@ import legal_notice_en
 PAGES = {
     "FR":
     {
+        "Test de l'algo de mentions légales": legal_notice_fr,
         "Analyse des processus de collecte de données": log_analysis_fr,
-        "Analyse des données": interface_fr,
-        "Test de l'algo de mentions légales": legal_notice_fr
+        "Analyse des données": interface_fr
     },
     "EN":
     {
+        "Test of legal notice algo": legal_notice_en,
         "Analysis of data collection processes": log_analysis_en,
-        "Analyse des données": interface_fr,
-        "Test of legal notice algo": legal_notice_en
+        "Analyse des données": interface_fr
     }
 }
 
-st.sidebar.image("image/logo.png", width=100)
+st.sidebar.image("logo.png", width=100)
 
 st.sidebar.title("Lang 🌍")
 lang_option = st.sidebar.selectbox("", ("FR", "EN"))
