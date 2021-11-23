@@ -17,14 +17,16 @@ def find_siret(html:str):
     """
     # List of related terms to 'Siret'
     liste_terme = [
-        'SIRET',
-        'Siret',
         'siret',
         'établissement',
         'numéro',
         'n°',
-        'n°suivant'   
+        'n°suivant',
+        'siren' 
     ]
+
+    # We put everything in lower case
+    html = html.lower()
 
     # Removal of punctuation and spaces
     # '\w+' matches any word character (equal to [a-zA-Z0-9_])
@@ -74,14 +76,16 @@ def find_siren(html:str):
     """
     # List of terms related to 'Siren'
     liste_terme = [
-        'SIREN',
-        'Siren',
         'siren',
-        'RCS',
+        'rcs',
         'numéro',
         'n°',
-        'n°suivant'
+        'n°suivant',
+        'siret'
     ]
+
+    # We put everything in lower case
+    html = html.lower()
 
     # Removal of punctuation and spaces
     tokenizer = RegexpTokenizer(r'°|\w+')
@@ -171,7 +175,7 @@ def find_tva(html:str):
                 except:
                     tva = "null"
                     continue
-                
+
     return tva
 
 
