@@ -1,25 +1,28 @@
+import streamlit as st
+st.set_page_config(layout="wide")
 import interface_fr
-import interface_en
 import log_analysis_en
 import log_analysis_fr
-import streamlit as st
+import legal_notice_fr
+import legal_notice_en
 
 
-st.set_page_config(layout="wide")
 PAGES = {
     "FR":
     {
         "Analyse des processus de collecte de données": log_analysis_fr,
-        "Analyse des données": interface_fr
+        "Analyse des données": interface_fr,
+        "Test de l'algo de mentions légales": legal_notice_fr
     },
     "EN":
     {
         "Analysis of data collection processes": log_analysis_en,
-        "Data analysis": interface_en
+        "Analyse des données": interface_fr,
+        "Test of legal notice algo": legal_notice_en
     }
 }
 
-st.sidebar.image("logo.png", width=100)
+st.sidebar.image("image/logo.png", width=100)
 
 st.sidebar.title("Lang 🌍")
 lang_option = st.sidebar.selectbox("", ("FR", "EN"))
