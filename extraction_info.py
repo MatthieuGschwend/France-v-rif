@@ -1,4 +1,6 @@
 from nltk.tokenize import RegexpTokenizer
+import re
+import streamlit as st
 
 
 def find_siret(html:str):
@@ -20,11 +22,13 @@ def find_siret(html:str):
         'siret',
         'établissement',
         'numéro',
-        'n°'    
+        'n°',
+        'n°suivant'   
     ]
 
     # Removal of punctuation and spaces
-    tokenizer = RegexpTokenizer(r'\w+')
+    # '\w+' matches any word character (equal to [a-zA-Z0-9_])
+    tokenizer = RegexpTokenizer(r'°|\w+')
     tokens = tokenizer.tokenize(html)
 
     # Empty the variable to rewrite it
@@ -38,16 +42,20 @@ def find_siret(html:str):
 
     for terme in liste_terme:
         if terme in html:
-            num_siret = ""
-            try:
-                siret = html.find(terme)
-                for caractere in range(siret + len(terme), siret + len(terme) + 14):
-                    num_siret += str(html[caractere])
-                num_siret = int(num_siret)
-                return num_siret
-            except:
-                num_siret = "null"
-                continue
+            all_occurences = [
+                string.start() for string in re.finditer(terme, html)]
+            for occurrence in all_occurences:
+                num_siret = ""
+                try:
+                    for caractere in range(
+                        occurrence + len(terme),
+                        occurrence + len(terme) + 14):
+                        num_siret += str(html[caractere])
+                    num_siret = int(num_siret)
+                    return num_siret
+                except:
+                    num_siret = "null"
+                    continue
 
     return num_siret                      
 
@@ -71,11 +79,12 @@ def find_siren(html:str):
         'siren',
         'RCS',
         'numéro',
-        'n°'    
+        'n°',
+        'n°suivant'
     ]
 
     # Removal of punctuation and spaces
-    tokenizer = RegexpTokenizer(r'\w+')
+    tokenizer = RegexpTokenizer(r'°|\w+')
     tokens = tokenizer.tokenize(html)
 
     # Empty the variable to rewrite it
@@ -89,16 +98,21 @@ def find_siren(html:str):
 
     for terme in liste_terme:
         if terme in html:
-            num_siren = ""
-            try:
-                siren = html.find(terme)
-                for caractere in range(siren + len(terme), siren + len(terme) + 9):
-                    num_siren += str(html[caractere])
-                num_siren = int(num_siren)
-                return num_siren
-            except:
-                num_siren = "null"
-                continue
+            # start(): tells the index of the starting position of the match.
+            all_occurences = [
+                string.start() for string in re.finditer(terme, html)]
+            for occurrence in all_occurences:
+                num_siren = ""
+                try:
+                    for caractere in range(
+                        occurrence + len(terme),
+                        occurrence + len(terme) + 9):
+                        num_siren += str(html[caractere])
+                    num_siren = int(num_siren)
+                    return num_siren
+                except:
+                    num_siren = "null"
+                    continue
 
     return num_siren
 
@@ -136,23 +150,28 @@ def find_tva(html:str):
     # All characters are concatenated without punctuation or spaces
     for token in tokens:
         html += token
-
+        
     tva = "null"
-
     for code_iso in liste_code:
         if code_iso in html:
-            tva = ""
-            try:
-                num_tva = html.find(code_iso)
-                for caractere in range(num_tva + len(code_iso), num_tva + len(code_iso) + 11):
-                    tva += str(html[caractere])
-                tva = int(tva) # To verify if we get an integer or not
-                tva = code_iso+str(tva)
-                return tva
-            except:
-                tva = "null"
-                continue
-
+            # start(): tells the index of the starting position of the match.
+            all_occurences = [
+                string.start() for string in re.finditer(code_iso, html)]
+            for occurrence in all_occurences:
+                tva = ""
+                try:
+                    # num_tva = html.find(code_iso)
+                    for caractere in range(
+                        occurrence + len(code_iso),
+                        occurrence + len(code_iso) + 11):
+                        tva += str(html[caractere])
+                    tva = int(tva) # To verify if we get an integer or not
+                    tva = code_iso+str(tva)
+                    return tva
+                except:
+                    tva = "null"
+                    continue
+                
     return tva
 
 
@@ -207,4 +226,3 @@ def find_mediator(html:str):
         mediator = False
 
     return mediator
-
