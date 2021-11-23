@@ -1,6 +1,7 @@
 import streamlit as st
 st.set_page_config(layout="wide")
 import interface_fr
+import interface_en
 import log_analysis_en
 import log_analysis_fr
 import legal_notice_fr
@@ -18,7 +19,7 @@ PAGES = {
     {
         "Test of legal notice algo": legal_notice_en,
         "Analysis of data collection processes": log_analysis_en,
-        "Analyse des données": interface_fr
+        "Analyse des données": interface_en
     }
 }
 
