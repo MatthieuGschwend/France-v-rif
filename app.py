@@ -19,7 +19,7 @@ PAGES = {
     {
         "Test of legal notice algo": legal_notice_en,
         "Analysis of data collection processes": log_analysis_en,
-        "Analyse des données": interface_en
+        "Data analysis": interface_en
     }
 }
 
