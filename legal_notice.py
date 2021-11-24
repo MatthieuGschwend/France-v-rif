@@ -31,6 +31,8 @@ class Http:
     
 
 async def get_aiohttp_res(url, req_option):
+    if "http" not in url:
+        url = 'http://' + url
     async with Http() as http:
         try:
             text_res, full_resp = await http.get_raw(url, **req_option)
@@ -89,6 +91,7 @@ async def main_legal_notice(url_to_analyze: str):
     "timeout": 10,
     "allow_redirects":True
     }
+
     tasks = []
     tasks += [get_aiohttp_res(clean_url[0], options)]
     responses1 = await asyncio.gather(*tasks)
