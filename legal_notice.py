@@ -1,4 +1,6 @@
 import pandas as pd
+import tqdm
+import sys
 import asyncio
 import aiohttp
 import html2text
@@ -37,8 +39,7 @@ async def get_aiohttp_res(url, req_option):
         try:
             text_res, full_resp = await http.get_raw(url, **req_option)
             return text_res, full_resp
-        except Exception as e:
-            st.write(e)
+        except:
             return None, None
 
 
@@ -46,10 +47,11 @@ async def main_legal_notice(url_to_analyze: str):
     """
     Example of url_to_analyze: 'ebay.fr'
     """
-    print(url_to_analyze)
     url_to_analyze = url_to_analyze.replace('http://', '')
     url_to_analyze = url_to_analyze.replace('https://', '')
     url_to_analyze = url_to_analyze.replace('www.', '')    
+    url_to_analyze = url_to_analyze.strip()
+    url_to_analyze = 'http://www.' + url_to_analyze
 
     # dictionary initialization
     data = {
@@ -77,47 +79,13 @@ async def main_legal_notice(url_to_analyze: str):
     'Cambodge', 'Cambodia', 'Indonesia', 'Indonesie', 'Bali', 'Inde',
     'India', 'Pakistan', 'Bangladesh', 'Hong Kong']
 
-    liste_sites = []
-    liste_sites.append(url_to_analyze)
-
-    clean_url = []
-    for url in liste_sites:
-        url = url.strip()
-        url = 'http://www.' + url
-        clean_url.append(url)
-
     options = {
     "headers": headers,
     "timeout": 10,
     "allow_redirects":True
     }
 
-    tasks = []
-    tasks += [get_aiohttp_res(clean_url[0], options)]
-    responses1 = await asyncio.gather(*tasks)
-
-    successful_results = []
-    success_code = []
-    bad_results = []
-    bad_code = []
-    for result, url in zip(responses1, clean_url):
-        text_result, full_resp = result
-        status_code = full_resp.status
-        if not text_result:
-            bad_results.append(url)
-            bad_code.append(status_code)
-        elif not str(status_code).startswith("2"):
-            bad_results.append(url)
-            bad_code.append(status_code)
-        else:
-            successful_results.append(result)
-            success_code.append(status_code)
-
-    all_codes = success_code
-    all_codes.extend(bad_code)
-
-    all_results = successful_results
-    all_results.extend(bad_results)
+    response = await get_aiohttp_res(url_to_analyze, options)
 
     legal_related_terms = [
         'Mentions Légales', 'mentions légales',
@@ -155,55 +123,60 @@ async def main_legal_notice(url_to_analyze: str):
     base_urls = []
     legal_notice_urls = []
     # print("Retreiving legal notice urls...")
-    for result in all_results:
-        text_result, full_resp = result
-        try:
-            url = str(full_resp.url)
-            base_url = url.split('/')[2]
-            bad_url = False
-        except:
-            url = str(full_resp.url)
-            base_url = url.split('/')[2]
-            bad_url = True
-        if not bad_url:
-            html = BeautifulSoup(text_result, 'html.parser')
-            href_tags = html.find_all(href=True)
-            legal_notice_url = None
-            for lien in href_tags:
-                href_text = lien.text
-                href = lien.get('href')
-                for term in legal_related_terms:
+
+    text_result, full_resp = response
+    # TODO: better catching of the code error
+    if full_resp is None:
+        data["response"] = 404
+    else:
+        data["response"] = full_resp.status
+
+    try:
+        url = str(full_resp.url)
+        base_url = url.split('/')[2]
+        bad_url = False
+    except:
+        url = url_to_analyze
+        base_url = url.split('/')[2]
+        bad_url = True
+    if not bad_url:
+        html = BeautifulSoup(text_result, 'html.parser')
+        href_tags = html.find_all(href=True)
+        legal_notice_url = None
+        for lien in href_tags:
+            href_text = lien.text
+            href = lien.get('href')
+            for term in legal_related_terms:
+                if term in href_text:
+                    legal_notice_url = href
+                    break
+                else:
+                    continue
+
+            if legal_notice_url == None:
+                for term in cgv_related_terms:
                     if term in href_text:
                         legal_notice_url = href
                         break
-                    else:
-                        continue
 
-                if legal_notice_url == None:
-                    for term in cgv_related_terms:
-                        if term in href_text:
-                            legal_notice_url = href
-                            break
-
-            if legal_notice_url is not None:
-                legal_notice_url = legal_notice_url.replace('https', 'http')
-                legal_notice_url = legal_notice_url.replace('www.', '')
-                legal_notice_url = legal_notice_url.replace(url, '')
-                if legal_notice_url.startswith("/"):
-                    legal_notice_url =  url[0:-1] + legal_notice_url
-                elif not legal_notice_url.startswith("http") and not legal_notice_url.startswith("/"):
-                    legal_notice_url = "http://" + base_url + "/" + legal_notice_url
-                legal_notice_urls.append(legal_notice_url)
-                base_urls.append(base_url)
-            else:
-                base_urls.append(base_url)
-                legal_notice_urls.append(base_url)
+        if legal_notice_url is not None:
+            legal_notice_url = legal_notice_url.replace('https', 'http')
+            legal_notice_url = legal_notice_url.replace('www.', '')
+            legal_notice_url = legal_notice_url.replace(url, '')
+            if legal_notice_url.startswith("/"):
+                legal_notice_url =  url[0:-1] + legal_notice_url
+            elif not legal_notice_url.startswith("http") and not legal_notice_url.startswith("/"):
+                legal_notice_url = "http://" + base_url + "/" + legal_notice_url
+            legal_notice_urls.append(legal_notice_url)
+            base_urls.append(base_url)
         else:
             base_urls.append(base_url)
-            legal_notice_urls.append(base_url)        
+            legal_notice_urls.append(base_url)
+    else:
+        base_urls.append(base_url)
+        legal_notice_urls.append(base_url)        
 
     # Requests of the legal notice urls found
-    print(legal_notice_urls)
     tasks = []
     tasks += [get_aiohttp_res(link, options) for link in legal_notice_urls]
     responses_legal = await asyncio.gather(*tasks)
@@ -225,7 +198,7 @@ async def main_legal_notice(url_to_analyze: str):
         """
         try:
             html = BeautifulSoup(
-                html.decode('utf-8','ignore'), features="lxml").get_text()
+                html.decode('iso-8859-1','ignore'), features="lxml").get_text()
             clean_html = html2text.html2text(html)
             clean_html = clean_html.strip()
             length = len(clean_html)
@@ -236,7 +209,7 @@ async def main_legal_notice(url_to_analyze: str):
         return clean_html, length
 
 
-    async def main(base_url, response, code):
+    async def main(base_url, response):
         base_url = base_url.replace('www.', '')
         html, full_resp = response
         if html is None:
@@ -255,12 +228,13 @@ async def main_legal_notice(url_to_analyze: str):
         data['triggered_strange_address'].append(country)
         data['has_mediator'].append(find_mediator(clean_html))
         data['url'].append(base_url)
-        data['response'].append(code)
 
 
     tasks = []
-    tasks += [main(base_url, response, code)
-        for base_url, response, code in zip(base_urls, responses_legal, all_codes)]
+    tasks += [
+        main(base_url, response) for base_url, response in
+        zip(base_urls, responses_legal)
+    ]
     await asyncio.gather(*tasks)
 
     # Conversion of the data into a dataframe table
@@ -270,7 +244,6 @@ async def main_legal_notice(url_to_analyze: str):
     data['legal_notice'] = data['legal_notice'] != "null"
 
     # Sorting of the table
-    data = data.sort_values(by='response', ascending=True)
     data = data.sort_values(by='legal_notice', ascending=False)
 
     # Column renaming
@@ -286,3 +259,43 @@ async def main_legal_notice(url_to_analyze: str):
     data = data[0]
 
     return data
+
+
+class Collector():
+    def batch(iterable, n=10):
+        "Divide a list every n indices. Used to make asyncio tasks safer"
+        l = len(iterable)
+        for ndx in range(0, l, n):
+            yield iterable[ndx:min(ndx + n, l)]
+
+    async def collection(urls):
+
+        """Returns a DataFrame"""
+        # asynchronous by batch of 10 urls
+        result = []
+        print("list len: ", len(urls))
+        for batch in tqdm.tqdm(Collector.batch(urls, 10), total=len(urls)//10):
+            tasks = []
+            for url in batch:
+                tasks += [main_legal_notice(url)]
+            result += [await f for f in asyncio.as_completed(tasks)]
+
+        # sequential
+        # result = []
+        # for url in tqdm(urls):
+        #     result += await main_legal_notice(url)
+
+        return pd.DataFrame.from_records(result)
+
+
+# urls = pd.read_csv("security-export - latest.csv")["domain"]
+# urls = urls.dropna()
+# urls = urls.drop_duplicates()
+# urls = urls.to_list()
+
+# https://github.com/encode/httpx/issues/914
+# if sys.version_info[0] == 3 and sys.version_info[1] >= 8 and sys.platform.startswith('win'):
+#     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+# res = asyncio.run(Collector.collection(urls))
+# res.to_csv("mentions_legales_algo_test.csv", index=False)
