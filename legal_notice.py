@@ -1,10 +1,9 @@
-import time
 import pandas as pd
 import asyncio
 import aiohttp
 import html2text
 from bs4 import BeautifulSoup
-from concurrent.futures import ThreadPoolExecutor
+import streamlit as st
 from extraction_info import find_siret, find_siren, find_strange_address, find_mediator, find_tva
 
 
@@ -27,17 +26,18 @@ class Http:
 
     async def get_raw(self, url, **kwargs):
         async with self._session.get(url, **kwargs) as resp:
-            try:
-                resp.raise_for_status()
-                return await resp.content.read(), resp
-            except:
-                return None, resp
-
+            resp.raise_for_status()
+            return await resp.content.read(), resp
+    
 
 async def get_aiohttp_res(url, req_option):
     async with Http() as http:
-        text_res, full_resp = await http.get_raw(url, **req_option)
-        return text_res, full_resp
+        try:
+            text_res, full_resp = await http.get_raw(url, **req_option)
+            return text_res, full_resp
+        except Exception as e:
+            st.write(e)
+            return None, None
 
 
 async def main_legal_notice(url_to_analyze: str):
@@ -49,11 +49,8 @@ async def main_legal_notice(url_to_analyze: str):
     url_to_analyze = url_to_analyze.replace('https://', '')
     url_to_analyze = url_to_analyze.replace('www.', '')    
 
-    # Time measurement for algorithm benchmarking
-    start = time.perf_counter()
-
-    # Dictionary initialization
-    dictionary = {
+    # dictionary initialization
+    data = {
         'url': [], # str
         'response': [], # int
         'legal_notice_url': [], # str
@@ -67,7 +64,7 @@ async def main_legal_notice(url_to_analyze: str):
         'has_mediator': [] # bool
     }
 
-    dictionary["url"]
+    data["url"]
 
     # List of strange countries
     country_list = ['New Mexico', 'Nouveau Mexique', 'Wyoming', 'Nevada',
@@ -202,8 +199,6 @@ async def main_legal_notice(url_to_analyze: str):
             legal_notice_urls.append(base_url)        
 
     # Requests of the legal notice urls found
-    # requests_legal = [grequests.get(link, headers=headers, timeout=10) for link in legal_notice_urls]
-    # responses_legal = grequests.map(requests_legal)
     print(legal_notice_urls)
     tasks = []
     tasks += [get_aiohttp_res(link, options) for link in legal_notice_urls]
@@ -225,7 +220,8 @@ async def main_legal_notice(url_to_analyze: str):
         length (int): Length of the html text (length of clean_html).
         """
         try:
-            html = BeautifulSoup(html, features="lxml").get_text()
+            html = BeautifulSoup(
+                html.decode('utf-8','ignore'), features="lxml").get_text()
             clean_html = html2text.html2text(html)
             clean_html = clean_html.strip()
             length = len(clean_html)
@@ -244,30 +240,27 @@ async def main_legal_notice(url_to_analyze: str):
         else:
             url_legal_notice = str(full_resp.url)
         clean_html, length = nettoyage(html)
-        dictionary['legal_notice_url'].append(url_legal_notice)
-        dictionary['legal_notice'].append(clean_html)
-        dictionary['character_nb'].append(length)
-        dictionary['siret'].append(find_siret(clean_html))
-        dictionary['siren'].append(find_siren(clean_html))
-        dictionary['vat'].append(find_tva(clean_html))
+        data['legal_notice_url'].append(url_legal_notice)
+        data['legal_notice'].append(clean_html)
+        data['character_nb'].append(length)
+        data['siret'].append(find_siret(clean_html))
+        data['siren'].append(find_siren(clean_html))
+        data['vat'].append(find_tva(clean_html))
         has_strange_adress, country = find_strange_address(clean_html, country_list)
-        dictionary['has_strange_address'].append(has_strange_adress)
-        dictionary['triggered_strange_address'].append(country)
-        dictionary['has_mediator'].append(find_mediator(clean_html))
-        dictionary['url'].append(base_url)
-        dictionary['response'].append(code)
+        data['has_strange_address'].append(has_strange_adress)
+        data['triggered_strange_address'].append(country)
+        data['has_mediator'].append(find_mediator(clean_html))
+        data['url'].append(base_url)
+        data['response'].append(code)
 
-    # with ThreadPoolExecutor() as executor:
-    #     _ = [executor.submit(main, base_url, response, code)
-    #     for base_url, response, code in zip(base_urls, responses_legal, all_codes)]
 
     tasks = []
     tasks += [main(base_url, response, code)
         for base_url, response, code in zip(base_urls, responses_legal, all_codes)]
     await asyncio.gather(*tasks)
 
-    # Conversion of the dictionary into a dataframe table
-    data = pd.DataFrame(dictionary)
+    # Conversion of the data into a dataframe table
+    data = pd.DataFrame(data)
 
     # Conversion to bool
     data['legal_notice'] = data['legal_notice'] != "null"
@@ -284,29 +277,8 @@ async def main_legal_notice(url_to_analyze: str):
         "vat": "has_vat"
     })
 
-    # # Cleaning url columns as multithreading method is messing up the data
-    # urls_list = data['legal_notice_url'].to_list()
-    # clean_list_url = []
-    # clean_list_legal = []
-    # for url in urls_list:
-    #     if "/" in url:
-    #         clean_list_legal.append(url)
-    #         url = url.split('/')
-    #         url = url[2]
-    #     else:
-    #         clean_list_legal.append('null')
-    #     url = url.replace('www.', '')
-    #     clean_list_url.append(url)
+    # Converting dataframe to data
+    data = data.to_dict('records')
+    data = data[0]
 
-    # data['url'] = clean_list_url
-    # data['legal_notice_url'] = clean_list_legal
-
-    # Converting dataframe to dictionary
-    dictionary = data.to_dict('records')
-    dictionary = dictionary[0]
-
-    finish = time.perf_counter()
-    formated_time = time.strftime('%Hh%Mm%Ss', time.gmtime(finish-start))
-    # print(f'\nFinished in {formated_time}')
-
-    return dictionary
+    return data
