@@ -145,6 +145,7 @@ async def main_legal_notice(url_to_analyze: str):
         'cgv', 'CGV',
 
         'Conditions générales', 'Condition Générales',
+        'Conditions Générales',
         'CONDITIONS GÉNÉRALES', 'CONDITIONS GENERALES',
                 
         'Conditions de vente', 'CONDITIONS DE VENTE'
