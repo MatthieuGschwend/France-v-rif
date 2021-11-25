@@ -169,7 +169,7 @@ def find_tva(html:str):
                         occurrence + len(code_iso),
                         occurrence + len(code_iso) + 11):
                         tva += str(html[caractere])
-                    tva = int(tva) # To verify if we get an integer or not
+                    int(tva) # To verify if we get an integer or not
                     tva = code_iso+str(tva)
                     return tva
                 except:
