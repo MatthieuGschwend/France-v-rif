@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 17 17:02:28 2021
-
-@author: Matthieu
-"""
-
 from datetime import timedelta
 from pathlib import Path
 from time import sleep
@@ -16,7 +9,7 @@ import streamlit as st
 
 
 def app():
-    #%%
+    #%% 
     @st.cache
     def load_data():
         '''Lecture du fichier csv'''
@@ -35,170 +28,14 @@ def app():
             return str(nb_annes) + an
         else:
             return str(nb_annes) + an + ' and ' + str(nb_mois_) + ' month'
-
-    def liste_item(data):
-        '''renvoie la liste des items '''
-        return data['product name'].unique()
-
-    def liste_replica(data_item):
-        ''' renvoie la liste des réplicas pour un item'''
-        return data_item['replica name'].unique()
-
-    def camembert(data, valeurs, noms ):
-        '''renvoie un camembert : propotion des valeurs selon les noms '''
-        fig = px.pie(data, values = valeurs, names = noms, title='Population of European continent')
-        st.plotly_chart(fig, use_container_width=True)
-
-    def info_generale_replica(data_item):
-        nb_replicas = data_item.shape[0]
-        replica_green_moy = data_item['replica is_green_website'].mean()
-        affluence_moy = data_item['rank'].mean()
-        prix_moyen = data_item['replica price'].mean() 
-        return df
+        
 
     def boolean_string(oui_ou_non):
         if(oui_ou_non == 1):
             return 'Yes'
         else : 
             return 'No'
-
-    def affichage_image(data_item):
-        try:
-            product_image = data_item['product image'].values[0]
-            return st.image(product_image, width = 200)
-        except:
-            pass
-
-    def affichage_prix(data_item):
-        try:
-            product_prix = str(data_item['product price'].values[0])
-            return st.markdown('- Price : ' + product_prix +' euros' )
-        except:
-            pass
-
-    def affichage_site(data_item):
-        try:
-            product_web_site  = data_item['product domain'].values[0]
-            product_web_site = "["+product_web_site +"]" + '(https://' + product_web_site + ')'
-            return st.markdown('- Web Site : ' + product_web_site)
-        except:
-            pass
-
-    def affichage_url(data_item):
-        try:
-            product_url  = data_item['product url'].values[0]
-            product_url = "[Product link]" + '(' + product_url + ')'
-            return st.markdown(product_url)
-        except:
-            pass
-
-    def affichage_anciennete(data_item):
-        try:
-            product_age_months = data_item['product website_age_in_months']\
-                                     .values[0]
-            return st.markdown('- Age : ' + mois_annees(product_age_months))
-        except:
-            pass
-
-    def affichage_shopify(data_item):
-        try:
-            product_shopify = data_item['product is_shopify'].values[0]
-            return st.markdown('- Shopify : ' + boolean_string(product_shopify))
-        except:
-            pass
-
-    def affichage_green(data_item):
-        try:
-            product_green = data_item['product is_green_website'].values[0]
-            return st.markdown('- Reliable : ' + boolean_string(product_green))
-        except:
-            pass
-
-    def affichage_classe(data_item):
-        try:
-            product_class = data_item['product class'].values[0]
-            return st.markdown('- Product class : ' + product_class)
-        except:
-            pass
-
-    def affichage_description(data_item):
-        try:
-            product_description = data_item['product description'].values[0]
-            return st.text_area('Description',value = product_description, height = 180)
-        except:
-            pass
-
-
-    def affichage_replica_image(data_item,replica_name):
-        try:
-            replica_image = data_item[data_item['replica name']==replica_name]\
-                ['replica image'].values[0]
-            return st.image(replica_image, width = 200)
-        except:
-            pass
-
-    def affichage_replica_prix(data_item, replica_name):
-        try:
-            replica_prix = data_item[data_item['replica name']==replica_name]\
-                ['replica price'].values[0]
-            replica_prix = str(replica_prix)
-            return st.markdown('- Price : ' + replica_prix +' euros')
-        except:
-            pass
-
-    def affichage_replica_site(data_item, replica_name):
-        try:
-            replica_site = data_item[data_item['replica name']==replica_name]\
-                ['replica domain'].values[0]
-            replica_site = "["+replica_site +"]" + '(https://' + replica_site + ')'
-            return st.markdown('- Web site : ' + replica_site)
-        except:
-            pass
-
-    def affichage_replica_url(data_item, replica_name):
-        try:
-            replica_url = data_item[data_item['replica name']==replica_name]\
-                ['replica url'].values[0]
-            replica_url = "[replica link]" + '(' + replica_url + ')'
-            return st.markdown(replica_url)
-        except:
-            pass
-
-
-    def affichage_replica_anciennete(data_item, replica_name):
-        try:
-            replica_age = data_item[data_item['replica name']==replica_name]\
-                ['replica website_age_in_months'].values[0]
-            return st.markdown('- Age : ' + mois_annees(replica_age))
-        except:
-            pass
-
-    def affichage_replica_shopify(data_item, replica_name):
-        try:
-             replica_shopify = data_item[data_item['replica name']==replica_name]\
-                ['replica is_shopify'].values[0]
-             return st.markdown('- Shopify : ' + boolean_string(replica_shopify))
-        except:
-            pass
-
-    def affichage_replica_green(data_item, replica_name):
-        try:
-            replica_green = data_item[data_item['replica name']==replica_name]\
-                ['replica is_green_website'].values[0]
-            return st.markdown('- Green web site : ' + boolean_string(replica_green))
-        except:
-            pass
-
-    def affichage_replica_description(data_item, replica_name):
-        try:
-            replica_description = data_item[data_item['replica name']==replica_name]\
-                ['replica description'].values[0]
-            return st.text_area('Description',value = replica_description, height = 180)
-        except:
-            pass
-
-
-
+        
     #%% Analyse ANOVA globale
     @st.cache
     def classe_anova_replica(data):
@@ -209,64 +46,31 @@ def app():
         site shopify'''
 
         liste_item = data['product name'].unique() # liste des produits
-
-        def ecart_moy_prix_replica(nom_produit, data):
-            '''Pour chaque produit nous voulons avoir le prix des réplicas,
-            en particulier l'écart moyen avec le prix original. Nous divisons cette 
-            différence par le prix original pour avoir des valeurs homogènes '''
-
+        green_moyen = [0]*len(liste_item)
+        shopify_moyen = [0]*len(liste_item)
+        label_item = [0]*len(liste_item)
+        age_article = [0]*len(liste_item)
+        article_prix = [0]*len(liste_item)
+        #Recuperation des information par produit
+        i = 0
+        for nom_produit in liste_item:
             data_item = data[data['product name'] == nom_produit]
-            prix_item = data_item['product price'].values[0]
-            liste_ecarts_prix = data_item['replica price']
-
-            return (liste_ecarts_prix - prix_item).mean()/prix_item
-
-        def moy_site_green_replica(nom_produit, data):
-            '''Proportion de site green dans les réplicas d'un produit'''
-            data_item = data[data['product name'] == nom_produit]
-            return data_item['replica is_green_website'].mean()
-
-        def moy_shopyfi_replica(nom_produit, data):
-            '''Proportion de site shopyfi dans les réplicas d'un produit'''
-            data_item = data[data['product name'] == nom_produit]
-            return data_item['replica is_shopify'].mean()
-
-        def classe_item(nom_produit, data):
-            data_item = data[data['product name'] == nom_produit]
-            return data_item['product class'].values[0]
-
-        def age_article(nom_produit, data):
-            data_item = data_item = data[data['product name'] == nom_produit]
-            return data_item['product website_age_in_months'].values[0]
-
-        def prix_article(nom_produit, data):
-            data_item = data_item = data[data['product name'] == nom_produit]
-            return data_item['product price'].values[0]
-
-
+            green_moyen[i] = data_item['replica is_green_website'].mean()
+            shopify_moyen[i] = data_item['replica is_shopify'].mean()
+            label_item[i] = data_item['product class'].values[0]
+            age_article[i] = data_item['product website_age_in_months'].values[0]
+            article_prix[i] = data_item['product price'].values[0]
+            i += 1            
         # Construction d'un data frame avec toutes les infos 
-        # 1 - valeurs des colonnes : 
-        prix_moyen = [ecart_moy_prix_replica(nom,data) for nom in liste_item]
-        green_moyen = [moy_site_green_replica(nom,data) for nom in liste_item]
-        shopify_moyen = [moy_shopyfi_replica(nom,data) for nom in liste_item]
-        label_item = [classe_item(nom, data) for nom in liste_item]
-        age_article = [age_article(nom, data) for nom in liste_item]
-        article_prix = [prix_article(nom, data) for nom in liste_item]
-
         df = pd.DataFrame({'Product name':liste_item,
-                               'Relative price differential': prix_moyen,
-                               'Proportion Green Web Site replicas': green_moyen, 
-                               'Proportion Shopify replicas': shopify_moyen,
-                               'Product class' : label_item,
-                               'Age' : age_article,
-                               'Product price': article_prix
-                               })
-
-        # fig = px.box(df, x="Classe du produit", y="Porportion Shopify",color = "Classe du produit")
-        # fig.update_traces(quartilemethod="exclusive") # or "inclusive", or "linear" by default
-        # st.plotly_chart(fig, use_container_width=True)
-
+                           'Proportion Green Web Site replicas': green_moyen, 
+                           'Proportion Shopify replicas': shopify_moyen,
+                           'Product class' : label_item,
+                           'Age' : age_article,
+                           'Product price': article_prix
+                           })
         return df
+
 
     def vue_ensemble_data(data_classe, prix_min, prix_max):
         data_ = data_classe[data_classe['Product price'] > prix_min]
@@ -283,8 +87,8 @@ def app():
         ''' Raport de corrélation entre une variable qualitative x et quantitative y'''
         moyenne = data_classe[var_qualitative].mean()
         classes = []
-        for classe in data_classe['Product class'].unique():
-            val_classe = data_classe[data_classe['Product class'] == classe][var_qualitative]
+        for classe in data_classe['Classe du produit'].unique():
+            val_classe = data_classe[data_classe['Classe du produit'] == classe][var_qualitative]
             classes.append({'ni': len(val_classe),
                             'moyenne_classe': val_classe.mean()})
         SCT = sum([(yj-moyenne)**2 for yj in data_classe[var_qualitative]])
@@ -294,20 +98,12 @@ def app():
                         +' et les classes des produits est de : ' + 
                         str(round(SCE/SCT,4)))
 
-
-
-
-
-
-
-
     #%% TEST
     def interface():  
 
         #st.title('Visualisation du data frame')
         data = load_data()
-
-
+        
         if st.sidebar.checkbox("Collected data", value=True):
 
             #mode = st.sidebar.selectbox('Liste des items',np.insert(liste_items,0," "))
@@ -317,38 +113,68 @@ def app():
             col1, col2 = st.columns(2)
             with col1:
                 st.header('Initial product')
-                liste_items = liste_item(data)
-                mode = st.selectbox('Produits list', liste_items)
+                liste_items = data['product name'].unique()
+                mode = st.selectbox('Product list', liste_items)
                 data_item = data[data['product name'] == mode]
-                affichage_image(data_item)
+                image_produit = data_item['product image'].values[0]
+                st.image(image_produit, width = 200)
 
             with col2:
                 st.header('Replicas')
-                liste_replicas = liste_replica(data_item)
-                replica_name = st.selectbox('Replicas list', liste_replicas)
-                affichage_replica_image(data_item,replica_name)
-
-
+                liste_replicas = data_item['replica name'].unique()
+                replica = st.selectbox('Replica list', liste_replicas)
+                data_item_replica = data_item[data_item['replica name']==replica]
+                image_replica = data_item_replica['replica image'].values[0]
+                st.image(image_replica, width = 200)
+                
+            
             col3, col4 = st.columns(2)
             with col3:
-                affichage_url(data_item)
-                affichage_description(data_item)
-                affichage_prix(data_item)
-                affichage_site(data_item)
-                affichage_green(data_item)
-                affichage_anciennete(data_item)
-                affichage_shopify(data_item)
-                affichage_classe(data_item)
+                # on recolte les informations sur le produit et on affiche
+                product_url  = data_item['product url'].values[0]
+                product_url = "[Product link]" + '(' + product_url + ')'
+                product_description = data_item['product description'].values[0]
+                product_prix = str(data_item['product price'].values[0])
+                product_web_site  = data_item['product domain'].values[0]
+                product_web_site = "["+product_web_site +"]" + '(https://' \
+                    + product_web_site + ')'
+                product_green = data_item['product is_green_website'].values[0]
+                product_age_months = data_item['product website_age_in_months'].values[0]
+                product_shopify = data_item['product is_shopify'].values[0]
+                product_class = data_item['product class'].values[0]
+                
+                st.markdown(product_url)
+                st.text_area('Description',value = product_description, height = 180)
+                st.markdown('- Price : ' + product_prix +' euros' )
+                st.markdown('- Web site : ' + product_web_site)
+                st.markdown('- Green web site : ' + boolean_string(product_green))
+                st.markdown('- Age : ' + mois_annees(product_age_months))
+                st.markdown('- Shopify : ' + boolean_string(product_shopify))
+                st.markdown('- Product class : ' + product_class)
+                
 
 
             with col4:
-                affichage_replica_url(data_item,replica_name)
-                affichage_replica_description(data_item,replica_name)
-                affichage_replica_prix(data_item,replica_name)
-                affichage_replica_site(data_item,replica_name)
-                affichage_replica_green(data_item,replica_name)
-                affichage_replica_anciennete(data_item,replica_name)
-                affichage_replica_shopify(data_item,replica_name)
+                # on recolte les informations sur la réplica et on affiche
+                replica_url = data_item_replica['replica url'].values[0]
+                replica_url = "[Replica link]" + '(' + replica_url + ')'
+                replica_description = data_item_replica['replica description'].values[0]
+                replica_prix = str(data_item_replica['replica price'].values[0])
+                replica_web_site  = data_item_replica['replica domain'].values[0]
+                replica_web_site = "["+replica_web_site +"]" + '(https://' \
+                    + replica_web_site + ')'
+                replica_green = data_item_replica['replica is_green_website'].values[0]
+                replica_age_months = data_item_replica['replica website_age_in_months'].values[0]
+                replica_shopify = data_item_replica['replica is_shopify'].values[0]
+                
+                st.markdown(replica_url)
+                st.text_area('Description',value = replica_description, height = 180)
+                st.markdown('- Price : ' + replica_prix +' euros' )
+                st.markdown('- Web site : ' + replica_web_site)
+                st.markdown('- Green web site : ' + boolean_string(replica_green))
+                st.markdown('- Age : ' + mois_annees(replica_age_months))
+                st.markdown('- Shopify : ' + boolean_string(replica_shopify))
+                
 
 
 
