@@ -6,17 +6,23 @@ import log_analysis_en
 import log_analysis_fr
 import legal_notice_fr
 import legal_notice_en
+import debugger
+import labelstudio
 
 
 PAGES = {
     "FR":
     {
+        "Debugger": debugger,
+        "Label Studio": labelstudio,
         "Test de l'algo de mentions légales": legal_notice_fr,
         "Analyse des processus de collecte de données": log_analysis_fr,
         "Analyse des données": interface_fr
     },
     "EN":
     {
+        "Debugger": debugger,
+        "Label Studio": labelstudio,
         "Test of legal notice algo": legal_notice_en,
         "Analysis of data collection processes": log_analysis_en,
         "Data analysis": interface_en
