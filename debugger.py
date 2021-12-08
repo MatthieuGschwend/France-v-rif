@@ -5,6 +5,5 @@ import webbrowser
 
 
 def app():
-    url = "http://161.35.202.8:8050/"
-    if st.button('Open debugger'):
-        webbrowser.open_new_tab(url)
+    link = '[Debugger](http://161.35.202.8:8050/)'
+    st.markdown(link, unsafe_allow_html=True)
