@@ -18,6 +18,8 @@ def app():
     form = st.form(key='label form')
     text_input = form.text_area(label='Enter a text to label. This will be sent to the label studio app.')
     submit_button = form.form_submit_button(label='Submit')
+    link = '[Click here to access to the Label Studio App](http://161.35.202.8:8080/)'
+    form.markdown(link, unsafe_allow_html=True)
     if submit_button:
         try:
             post_to_label_studio_app(text_input)
