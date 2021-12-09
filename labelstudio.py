@@ -16,7 +16,7 @@ def post_to_label_studio_app(text):
 
 def app():
     form = st.form(key='label form')
-    text_input = form.text_input(label='Enter some text')
+    text_input = form.text_area(label='Enter a text to label')
     submit_button = form.form_submit_button(label='Submit')
     if submit_button:
         try:
